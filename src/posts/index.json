@@ -1,0 +1,22 @@
+{
+  "all_topics": [
+    "SHUA",
+    "Ada",
+    "Security",
+    "TLS"
+  ],
+  "index": [
+    {
+      "title": "Should Have Used Ada (SHUA) #1 - Goto fail",
+      "Author": "Richard Wai",
+      "abstract": "This is our first blog post!",
+      "topics": [
+        "SHUA",
+        "Ada",
+        "Security",
+        "TLS"
+      ],
+      "sequence": 1
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+@import "../../sass/style.scss";
+
+.container {
+  margin: auto !important;
+}
+
+body {
+  background-color: $as-dark;
+}
+
+#content_area {
+  min-height: 90vh;
+}
+
+.navbar {
+  padding: 0;
+  margin: 0;
+  font-family: "Saira Condensed", sans-serif !important;
+  background-color: $as-primary !important;
+  //box-shadow: 2px 2px 10px #000;
+
+  /*.container {
+    justify-content: left !important;
+  }*/
+
+  .header-text {
+    padding: 0;
+    margin-top: 0em;
+    margin-bottom: 0em;
+    margin-left: 1em;
+    font-weight: bold;    
+    font-family: "Saira Condensed", sans-serif !important;
+    font-size: 2.2em;
+  }
+
+  @include media-breakpoint-down(sm) {
+    a {
+      margin: auto;
+    }
+
+    img {
+      margin: auto;
+      max-width: 300px;
+    }
+
+    .header-text {
+      visibility: hidden;
+      margin: 0;
+      font-size: 0;
+    }
+  }
+  
+}
+  
+footer {
+
+
+  display: block;
+  height: 5vh;
+  width: 100%;
+  background-color: $as-primary;
+  display: block;
+
+
+  color: white;
+  padding: 0;
+  margin-left: 0 !important;
+  margin-top: 0.4em;
+
+  justify-content: left !important;
+ 
+
+  @include media-breakpoint-down(md) {
+
+      padding-left: 8%;
+      padding-right: 8%;
+
+      font-size: 0.8em;
+      padding-top: 1em;
+  }
+}
+
+  
+

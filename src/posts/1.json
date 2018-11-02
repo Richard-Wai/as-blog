@@ -1,0 +1,169 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "One of the most common criticisms of Ada has to be the perceived verbosity. In fact, this is a deliberate design decision. Often in our rush to insert more and more programmer convinces into our favourite languages, we tend to miss the raw human weaknesses that turn these shortcuts into unrelenting hazards."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "We have been using systems and technology for eons to limit the effects of our own human weaknesses. An early example is double-entry accounting, a system who's basic function is to catch common human errors, is thousands of years old. Yet it is rare to find accountants who believe accrual accounting should be abandoned, and replaced with something more error-prone but convenient. Perhaps they recognize that the often tedious demands of accrual accounting is exactly what makes it so effective."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Pilots, who fly planes every day of their career, often the same plane each time, always perform the same checklists, every single time. Checklist such as these are another time-tested system to avoid the common human weakness of complacency through repetition. The truth is, the more comfortable we get at a skill, the less alert we become to the details. One rarely finds accountants complaining about checklists; because they know what their purpose is, and how important they are."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ada was specifically designed with the recognition that programming itself is a human activity, and this means it is subject to human weakness. Ada was developed with a specific and intentional goal of using technology to limit the negative effects of human weaknesses. It's strict type system and data modeling require careful consideration and careful design. It's verbose nature aids in readability, maintainability, and makes small mistakes like we will talk about today, less likely to slip through unnoticed, or indeed to occur at all."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "In fact, Ada is perhaps the only mature language that began its life with a rigorously refined set of requirements that went through four revisions over three years, before any language design began. Those basic requirements live-on as the very first section of the Ada specification: \"Design Goals\". The C++ standard has no equivalent rationale whatsoever."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Here are some highlights from the Ada 2012 standard:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/blog_assets/1/ada_rm_design_goals.jpg",
+      "alt": "Ada 2012 Reference Manual - Pg xii, various highlights"
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "In these \"SHUA\" posts, I seek to look at the regular stream of vulnerabilities in open source software, and emulate as reasonably possible what the same programmer would have likely produced, had they simply been using Ada."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "procedure"
+            },
+            {
+              "emphasis": "none",
+              "segment": "test"
+            },
+            {
+              "emphasis": "bold",
+              "segment": "is"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "begin"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "italic",
+              "segment": "-- I love Ada!"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Put_Line (\"Hello World!\");"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end"
+            },
+            {
+              "emphasis": "none",
+              "segment": "test;"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

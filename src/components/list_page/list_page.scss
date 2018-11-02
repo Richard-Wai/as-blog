@@ -1,0 +1,21 @@
+@import "../layout/layout.scss";
+
+.push_down {
+  display: block;
+  opacity: 0;
+  height: 5vh;
+}
+
+#article_list {
+  margin: auto !important;
+}
+
+h1 {
+  font-size: 2em;
+  font-style: bold;
+}
+
+h2 {
+  font-size: 1.5em;
+  font-style: bold;
+}
