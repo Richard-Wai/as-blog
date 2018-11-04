@@ -13,15 +13,23 @@ const elaborateBlock = (c) => (
       var segment_actual;
       switch (seg.emphasis) {
         case "bold":
-          segment_actual = <strong>{seg.segment} </strong>
+          segment_actual = <strong>{seg.segment}</strong>
           break
 
         case "italic":
-          segment_actual = <i>{seg.segment} </i>
+          segment_actual = <i>{seg.segment}</i>
+          break
+
+        case "highlight":
+          segment_actual = <span className="highlighted_text">{seg.segment}</span>
+          break
+
+        case "bold_highlight":
+          segment_actual = <strong className="highlighted_text">{seg.segment}</strong>
           break
 
         case "none":
-          segment_actual = <span>{seg.segment} </span>
+          segment_actual = <span>{seg.segment}</span>
           break
 
         default:
@@ -30,7 +38,7 @@ const elaborateBlock = (c) => (
 
       return ('link' in seg) ?
         <a key={index} href={seg.link}>{segment_actual}</a> :
-        <div key={index}>{segment_actual}</div>
+        <span key={index}>{segment_actual}</span>
 
 
     })

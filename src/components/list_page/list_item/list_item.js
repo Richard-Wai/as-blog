@@ -19,6 +19,7 @@ const listItem = (props) => {
       <div>
         <h1>{post.title}</h1>
         <hr />
+        <div className="author_name">{post.author}</div>
       </div> :
 
       <div className="blogListItem">

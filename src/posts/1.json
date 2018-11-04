@@ -110,13 +110,330 @@
           "indent": 0,
           "line": [
             {
+              "emphasis": "none",
+              "segment": "static OSStatus"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "SSLVerifySignedServerKeyExchange(SSLContext *ctx, bool isRsa, SSLBuffer signedParams,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "                                 uint8_t *signature, UInt16 signatureLen)"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "{"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "OSStatus        err;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "if ((err = ReadyHash(&SSLHashSHA1, &hashCtx)) != 0)"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "goto fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "if ((err = SSLHashSHA1.update(&hashCtx, &clientRandom)) != 0)"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "goto fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "if ((err = SSLHashSHA1.update(&hashCtx, &serverRandom)) != 0)"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "goto fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "if ((err = SSLHashSHA1.update(&hashCtx, &signedParams)) != 0)"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "goto fail;"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "goto fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "if ((err = SSLHashSHA1.final(&hashCtx, &hashOut)) != 0)"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "goto fail;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "fail:"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "SSLFreeBuffer(&signedHashes);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "SSLFreeBuffer(&hashCtx);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "return err;"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
               "emphasis": "bold",
-              "segment": "procedure"
+              "segment": "function "
             },
             {
               "emphasis": "none",
-              "segment": "test"
+              "segment": "SSL_Versify_Signed_Server_Key_Exchange"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "(Context      : "
             },
+            {
+              "emphasis": "bold",
+              "segment": "in out "
+            },
+            {
+              "emphasis": "none",
+              "segment": "SSL_Context;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " Is_RSA       : "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "in     "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Boolean;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " Signed_Params: "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "in     "
+            },
+            {
+              "emphasis": "none",
+              "segment": "SSL_Buffer_Access;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " Signature    : "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "in     "
+            },
+            {
+              "emphasis": "none",
+              "segment": "SSL_Signature)"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "-- Note we can get \"signatureLen\" from Signature'Length"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "return "
+            },
+            {
+              "emphasis": "none",
+              "segment": "OS_Status"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
             {
               "emphasis": "bold",
               "segment": "is"
@@ -124,42 +441,1310 @@
           ]
         },
         {
-          "indent": 0,
-          "line": [
-            {
-              "emphasis": "bold",
-              "segment": "begin"
-            }
-          ]
-        },
-        {
-          "indent": 2,
-          "line": [
-            {
-              "emphasis": "italic",
-              "segment": "-- I love Ada!"
-            }
-          ]
-        },
-        {
-          "indent": 2,
+          "indent": 1,
           "line": [
             {
               "emphasis": "none",
-              "segment": "Put_Line (\"Hello World!\");"
+              "segment": "Ret_Error: OS_Status;"
             }
           ]
         },
         {
-          "indent": 0,
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Hash_Ctx : SSL_Buffer_Access := "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "null;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Hash_Out : SSL_Buffer_Access := "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "null;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := Ready_Hash (SSL_Hash_SHA1, Hash_Ctx);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
           "line": [
             {
               "emphasis": "bold",
-              "segment": "end"
+              "segment": "if "
             },
             {
               "emphasis": "none",
-              "segment": "test;"
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Update (Hash_Ctx, Server_Random);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Update (Hash_Ctx, Client_Random);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Update (Hash_Ctx, Signed_Params);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Final (Hash_Ctx, Hash_Out);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "<<Fail>>"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "SSL_Free_Buffer (Hashes);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "SSL_Free_Buffer (Signed_Hashes);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "SSL_Free_Buffer (Hash_Ctx);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "return "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end "
+            },
+            {
+              "emphasis": "none",
+              "segment": "SSL_Versify_Signed_Server_Key_Exchange;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "highlight",
+              "segment": "if ((err = SSLHashSHA1.update(&hashCtx, &serverRandom)) != 0)"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "highlight",
+              "segment": "goto fail;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "highlight",
+              "segment": "if ((err = SomeOtherFunction) != 0)"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "goto fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "if ((err = SSLHashSHA1.final(&hashCtx, &hashOut)) != 0)"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "goto fail;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "if ((err = SSLHashSHA1.update(&hashCtx, &serverRandom)) != 0)"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "goto fail;"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "goto fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "if ((err = SSLHashSHA1.final(&hashCtx, &hashOut)) != 0)"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "goto fail;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "highlight",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Update (Hash_Ctx, Server_Random);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold_highlight",
+              "segment": "if "
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold_highlight",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold_highlight",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold_highlight",
+              "segment": "end if;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "highlight",
+              "segment": "Ret_Error := Some_Other_Function;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold_highlight",
+              "segment": "if "
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold_highlight",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold_highlight",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Final (Hash_Ctx, Hash_Out);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Update (Hash_Ctx, Server_Random);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Final (Hash_Ctx, Hash_Out);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Update (Hash_Ctx, Client_Random);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Final (Hash_Ctx, Hash_Out);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := Ready_Hash (SSL_Hash_SHA1, Hash_Ctx);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Update (Hash_Ctx, Server_Random);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Update (Hash_Ctx, Client_Random);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Update (Hash_Ctx, Signed_Params);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error := SSL_Hash_SHA1.Final (Hash_Ctx, Hash_Out);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Ret_Error /= OK "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Fail;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " "
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "$ gcc -c fail.adb"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "fail.adb:22:04: warning: unreachable code"
             }
           ]
         }

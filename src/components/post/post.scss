@@ -1,6 +1,12 @@
 @import "../layout/layout.scss";
 @import url("https://fonts.googleapis.com/css?family=Inconsolata");
 
+small {
+  font-size: 0.75;
+  margin-top: 0;
+  padding: 0;
+}
+
 .post_pushdown {
   display: block;
   opacity: 0;
@@ -16,6 +22,11 @@
   margin: 0;
   padding: 1em 2em 2em 2em; 
 
+  .highlighted_text {
+    color:rgba(0,0,0,0.5);
+    background-color: $as-reading-text; 
+  }
+
   @include media-breakpoint-up(xl) {
     padding-right: 15%;
   }
@@ -27,12 +38,21 @@
   background-color: rgba(27, 27, 27, 0.75);
   font-family: "Inconsolata";
   max-width: 100%;
-  font-size: 1.1em;
+  font-size: 0.8em;
   line-height: 1.25;
+
+  white-space: pre;
+
+  overflow: auto;
 
   padding: 1em;
   margin-left: 2em;
-  margin-right: 3em;
+  margin-right: 4em;
+
+  .highlighted_text {
+    color: rgba(27, 27, 27, 0.75);
+    background-color: rgb(134, 197, 255);
+  }
 
   @include media-breakpoint-down(sm) {
     margin: 0;
@@ -66,6 +86,7 @@
     padding-left: 2em;
     padding-right: 3em;
     margin-right: 2em;
+
 
     @include media-breakpoint-up(xl) {
       margin-right: 15%;
