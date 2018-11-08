@@ -54,6 +54,9 @@ const elaborateParagraph = (p) => {
     case "text":
       return (<div className="post_paragraph">{elaborateBlock(p.block)}</div>)
 
+    case "quote":
+      return (<div className="quote_block">{elaborateBlock(p.block)}</div>)
+
     case "code":
       return (<div className="code_block">{elaborateBlock(p.block)}</div>)
 
@@ -78,7 +81,7 @@ const Post = (props) => {
   ))
 
   return (
-    <Layout>
+    <Layout pageUrl={props.location.href} pageTitle={header.title} pageDescription={header.abstract} pageImage={header.image}>
       <section className="post_pushdown"></section>
       <section className="container">
 

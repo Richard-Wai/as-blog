@@ -8,7 +8,16 @@
           "line": [
             {
               "emphasis": "none",
-              "segment": "One of the most common criticisms of Ada has to be the perceived verbosity. In fact, this is a deliberate design decision. Often in our rush to insert more and more programmer convinces into our favourite languages, we tend to miss the raw human weaknesses that turn these shortcuts into unrelenting hazards."
+              "segment": "Human society has a long tradition of designing and applying systems and technologies to limit the effects of our own inherent weaknesses. An early example is double-entry accounting; a system who's basic function is to catch common errors, and is "
+            },
+            {
+              "emphasis": "none",
+              "segment": "more than 700 years old.",
+              "link": "https://en.wikipedia.org/wiki/History_of_accounting"
+            },
+            {
+              "emphasis": "none",
+              "segment": " Yet it is rare to find accountants who believe double-entry accounting should be abandoned, and replaced with something more error-prone but \"convenient\". Perhaps they recognize that the often tedious demands of double-entry accounting is exactly what makes it so reliable. Like most things in life, planning and care in the present pays off handsomely with stability and predictability in the future."
             }
           ]
         }
@@ -22,7 +31,7 @@
           "line": [
             {
               "emphasis": "none",
-              "segment": "We have been using systems and technology for eons to limit the effects of our own human weaknesses. An early example is double-entry accounting, a system who's basic function is to catch common human errors, is thousands of years old. Yet it is rare to find accountants who believe accrual accounting should be abandoned, and replaced with something more error-prone but convenient. Perhaps they recognize that the often tedious demands of accrual accounting is exactly what makes it so effective."
+              "segment": "A common criticism of Ada includes a perceived excess verbosity. In fact, that was a deliberate design decision. Often in our rush to insert more and more programmer convinces into our favourite languages, we tend to miss the raw human weaknesses that turn those shortcuts into unrelenting hazards."
             }
           ]
         }
@@ -36,49 +45,29 @@
           "line": [
             {
               "emphasis": "none",
-              "segment": "Pilots, who fly planes every day of their career, often the same plane each time, always perform the same checklists, every single time. Checklist such as these are another time-tested system to avoid the common human weakness of complacency through repetition. The truth is, the more comfortable we get at a skill, the less alert we become to the details. One rarely finds accountants complaining about checklists; because they know what their purpose is, and how important they are."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "text",
-      "block": [
-        {
-          "indent": 0,
-          "line": [
+              "segment": "Ada is perhaps the only mature, general-purpose language that began its life with a "
+            },
             {
               "emphasis": "none",
-              "segment": "Ada was specifically designed with the recognition that programming itself is a human activity, and this means it is subject to human weakness. Ada was developed with a specific and intentional goal of using technology to limit the negative effects of human weaknesses. It's strict type system and data modeling require careful consideration and careful design. It's verbose nature aids in readability, maintainability, and makes small mistakes like we will talk about today, less likely to slip through unnoticed, or indeed to occur at all."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "text",
-      "block": [
-        {
-          "indent": 0,
-          "line": [
+              "segment": "rigorously refined set of requirements",
+              "link": "http://www.adahome.com/History/Steelman/steeltab.htm"
+            },
             {
               "emphasis": "none",
-              "segment": "In fact, Ada is perhaps the only mature language that began its life with a rigorously refined set of requirements that went through four revisions over three years, before any language design began. Those basic requirements live-on as the very first section of the Ada specification: \"Design Goals\". The C++ standard has no equivalent rationale whatsoever."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "text",
-      "block": [
-        {
-          "indent": 0,
-          "line": [
+              "segment": " that went through four revisions over three years, before any language design began. Those basic requirements live-on as the very first section of the "
+            },
             {
               "emphasis": "none",
-              "segment": "Here are some highlights from the Ada 2012 standard:"
+              "segment": "Ada specification",
+              "link": "http://www.adaic.org/ada-resources/standards/ada12/"
+            },
+            {
+              "emphasis": "bold",
+              "segment": ": \"Design Goals\". "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Many popular language standards lack any such broad statement of intent, let alone a thorough requirements discovery process that preceded the language design."
             }
           ]
         }
@@ -97,7 +86,62 @@
           "line": [
             {
               "emphasis": "none",
-              "segment": "In these \"SHUA\" posts, I seek to look at the regular stream of vulnerabilities in open source software, and emulate as reasonably possible what the same programmer would have likely produced, had they simply been using Ada."
+              "segment": "The \"Should Have Used Ada\" (SHUA) series selects examples from the "
+            },
+            {
+              "emphasis": "none",
+              "segment": "daily stream",
+              "link": "https://twitter.com/cvenew"
+            },
+            {
+              "emphasis": "none",
+              "segment": " of vulnerabilities in common software, which are often due to the convolution of human error and programmer-biased language design. The theme is to demonstrate with salient examples how Ada can innately protect applications from common errors."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Our first vulnerability looks at the (in)famous \"Goto fail\" iOS SSL/TLS vulnerability from 2014. "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Here",
+              "link": "https://www.imperialviolet.org/2014/02/22/applebug.html"
+            },
+            {
+              "emphasis": "none",
+              "segment": " is an excellent blog-post discussing the vulnerability in detail."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "We'll do a really quick and simple run-down of the key points. Following is an abbreviated selection of the original code before it was patched (full listing "
+            },
+            {
+              "emphasis": "none",
+              "segment": "here",
+              "link": "http://opensource.apple.com/source/Security/Security-55471/libsecurity_ssl/lib/sslKeyExchange.c"
+            },
+            {
+              "emphasis": "none",
+              "segment": ")."
             }
           ]
         }
@@ -302,6 +346,65 @@
             {
               "emphasis": "none",
               "segment": "}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "The above function's role is to verify a key exchange, returning a status code (\"OSStatus\") declaring the result of the verification. We see that \"err\" is used as a running result from a string of hash operations. The idea being that if one of the operations should fail, then that specific failure code is dutifully returned. Unfortunately this means that as long as \"serverRandom\" and \"signedParams\" are successfully hashed, no actual comparison or verification is made thereafter, since the third goto statement is unconditionally executed, which then reports that the verification is \"OK\", even if it really isn't."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Now looking at this error, it is probably safe to assume that the programmer did not intentionally insert \"goto fail\" twice. "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Some",
+              "link": "https://news.ycombinator.com/item?id=7319028"
+            },
+            {
+              "emphasis": "none",
+              "segment": " speculate it came from tripping-over-keys in Vim, though most agree it was a poorly executed merge or copy-paste operation. Indeed, there are not many other conclusions to be made if deliberate actions are ruled-out."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Let's start-off by imagining what the pre-bug condition would look like in Ada. The goal here is to put ourselves in the shoes of the original programmer, and try to represent their style, as if they were Ada programmers "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "at the time"
+            },
+            {
+              "emphasis": "none",
+              "segment": " (not necessarily good Ada programmers)."
             }
           ]
         }
@@ -844,6 +947,62 @@
       ]
     },
     {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "One popular shortcut missing from Ada is the ability to test the result of a function simultaneously with the assignment of that function's result to a variable. We see this here, with distinct (and yes, verbose) try and test blocks for each hash operation. Like nearly everything in Ada, this is deliberate. Separating assignment from evaluation like this aids readability, and prevents unintentional side-effects."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "We are not trying to make this post about improving the flawed code, or improving coding practices in general. Rather the point is to demonstrate Ada's innate ability to protect against poor practices. It is easy to say that something should be done in some way (in theory). It is a whole other thing to ensure that people will really do it (in practice). Ada was deliberately designed with the awareness that human programmers can be expected to make mistakes, and lots of them. Therefore we are not talking about how Ada enables better software engineering practices, though it certainly does. Rather, we want to demonstrate how the exact same poor practices that led to a serious vulnerability, if implemented through Ada, would have been outright precluded, or otherwise identified early-on."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Let's now simulate the most likely scenarios discussed above which could have lead to the Goto fail vulnerability appearing. We'll start with a common copy-paste replace operation."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Imagine we copy this highlighted region:"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "type": "code",
       "block": [
         {
@@ -861,6 +1020,20 @@
             {
               "emphasis": "highlight",
               "segment": "goto fail;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "And then paste it over a target region:"
             }
           ]
         }
@@ -908,6 +1081,20 @@
       ]
     },
     {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "This is gives us the vulnerability immediately:"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "type": "code",
       "block": [
         {
@@ -952,6 +1139,34 @@
             {
               "emphasis": "none",
               "segment": "goto fail;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Can we make the same error in Ada? Surely, but it could never work if the target was only a single line.  We'd just end-up repeating the test of Ret_Error twice (harmlessly). So let's try to be more realistic, let's say we forgot to select the last line of the target, which is a realistic error."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "So we copy the full block:"
             }
           ]
         }
@@ -1005,6 +1220,20 @@
             {
               "emphasis": "bold_highlight",
               "segment": "end if;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Pasting over the highlighted block (minus one line - by accident):"
             }
           ]
         }
@@ -1130,6 +1359,20 @@
       ]
     },
     {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "And we get... Something that is not valid Ada, and will be outright refused by the compiler:"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "type": "code",
       "block": [
         {
@@ -1252,6 +1495,42 @@
             {
               "emphasis": "none",
               "segment": " "
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Of course, this scenario is caught in C too "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "if brackets are enforced. "
+            },
+            {
+              "emphasis": "none",
+              "segment": "In Ada, \"end if\" isn't optional. All blocks of every kind must have an \"end\". This is an important distinction. If this scenario is really what introduced the vulnerability, Ada would have caught it by it's very nature."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "How about single line deletion? Imagine we had some other property that we no longer wanted to include in the hash. We know that would lead to the vulnerability in C. But in Ada, it is totally benign. Like with a single line replace as above, this would just result in a duplicate test of Ret_Error."
             }
           ]
         }
@@ -1419,6 +1698,42 @@
             {
               "emphasis": "none",
               "segment": " "
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "In fact, overall we find that there would never be a time that Goto fail would appear outside of some kind of block, usually an if statement. Unless deliberate, it would be extremely unlikely to find the goto outside of a conditional block  by sheer accident."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Even in the very worst case, where the result was programmatically identical to the original ,the "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "default"
+            },
+            {
+              "emphasis": "none",
+              "segment": " gcc compiler configuration warns us:"
             }
           ]
         }
@@ -1745,6 +2060,20 @@
             {
               "emphasis": "none",
               "segment": "fail.adb:22:04: warning: unreachable code"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Testing and quality standards are always basic requirements for any engineering project. However, total coverage is often impossible or impractically expensive. This is especially true for commercial software, which is not regulated in any meaningful way, unlike safety-critical software.  Rather than trying to eliminate these kinds of basic errors through endlessly stricter standards and expanded testing on a more error-prone language, Ada can be leveraged to create a more focused, efficient, and reliable testing environment. In essence, using Ada introduces built-in static and dynamic analysis by design, which can eliminate or identify most common vulnerabilities, allowing testing to focus on errors in the higher-level program behavior."
             }
           ]
         }

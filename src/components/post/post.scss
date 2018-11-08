@@ -41,10 +41,6 @@ small {
   font-size: 0.8em;
   line-height: 1.25;
 
-  white-space: pre;
-
-  overflow: auto;
-
   padding: 1em;
   margin-left: 2em;
   margin-right: 4em;
@@ -56,6 +52,41 @@ small {
 
   @include media-breakpoint-down(sm) {
     margin: 0;
+    font-size: 0.5em;
+  }
+
+  .tab-0 {
+    padding-left: 0em;
+  }
+
+  .tab-1 {
+    padding-left: 1em;
+  }
+
+  .tab-2 {
+    padding-left: 2em;
+  }
+}
+
+.quote_block {
+  color: white;
+  max-width: 100%;
+  font-size: 1em;
+  line-height: 1.25;
+
+  white-space: pre;
+
+  padding: 1em;
+  margin-left: 1em;
+
+  .highlighted_text {
+    color: $as-dark;
+    background-color: white;
+  }
+
+  @include media-breakpoint-down(sm) {
+    margin: 0;
+    font-size: 0.8em;
   }
 
   .tab-0 {
