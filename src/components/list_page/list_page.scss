@@ -7,7 +7,10 @@
 }
 
 #article_list {
+  cursor: default !important;
   margin: auto !important;
+
+  
 }
 
 h1 {
@@ -16,6 +19,49 @@ h1 {
 }
 
 h2 {
-  font-size: 1.5em;
+  font-size: 1.5em !important;
   font-style: bold;
+}
+
+.blogFilters {
+  display: block;
+  padding-left: 0.75em;
+  padding-right: 0.75em;
+  padding-top: 0.1em;
+  margin: 0;
+  margin-bottom: 1em;
+  background-color: rgba(0,0,0,0.5);
+  width: 100% !important;
+
+  color: rgb(165, 165, 165);
+
+  transition-duration: 0.3s;
+  -webkit-transition-duration: 0.3s;
+  -moz-transition-duration: 0.3s;
+
+  cursor: pointer !important;
+
+  h3 {
+    margin: 0;
+    margin-right: 0.5em;
+    padding: 0;
+    
+    font-size: 1.3em !important;
+    display: inline-block !important;
+  }
+
+  .filter_topic {
+    display: inline-flex;
+    padding: 0;
+    margin: 0;
+
+    transition-duration: 0.3s;
+    -webkit-transition-duration: 0.3s;
+    -moz-transition-duration: 0.3s;
+
+    h3:hover {
+      text-decoration: line-through;
+    }
+  }
+
 }

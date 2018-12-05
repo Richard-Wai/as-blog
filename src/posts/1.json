@@ -62,12 +62,8 @@
               "link": "http://www.adaic.org/ada-resources/standards/ada12/"
             },
             {
-              "emphasis": "bold",
-              "segment": ": \"Design Goals\". "
-            },
-            {
               "emphasis": "none",
-              "segment": "Many popular language standards lack any such broad statement of intent, let alone a thorough requirements discovery process that preceded the language design."
+              "segment": ": \"Design Goals\". Many popular language standards lack any such broad statement of intent, let alone a thorough requirements discovery process that preceded the language design."
             }
           ]
         }
@@ -396,15 +392,15 @@
           "line": [
             {
               "emphasis": "none",
-              "segment": "Let's start-off by imagining what the pre-bug condition would look like in Ada. The goal here is to put ourselves in the shoes of the original programmer, and try to represent their style, as if they were Ada programmers "
+              "segment": "Let's start-off by imagining what the pre-bug condition would look like in Ada. The goal here is to put ourselves in the shoes of the original programmer, and try to represent their style, as if they were an Ada programmer "
             },
             {
               "emphasis": "italic",
-              "segment": "at the time"
+              "segment": "at the time "
             },
             {
               "emphasis": "none",
-              "segment": " (not necessarily good Ada programmers)."
+              "segment": "(not necessarily a good Ada programmer)."
             }
           ]
         }

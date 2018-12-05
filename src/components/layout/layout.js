@@ -1,5 +1,6 @@
 import React from 'react'
 import Helmet from 'react-helmet'
+import { Link } from 'gatsby'
 import AS_Logo from '../../assets/annexi-strayline-blue.svg'
 import './layout.scss'
 
@@ -9,7 +10,7 @@ const Layout = (props) => {
     <div id="mainbody">
       <header>
         <Helmet>
-          <title>ANNEXI-STRAYLINE Blog: {props.pageTitle}</title>
+          <title>ANNEXI-STRAYLINE Blog - {props.pageTitle}</title>
           <link rel="canonical" href={props.pageUrl} />
           <meta property="og:url" content={props.pageUrl} />
           <meta property="og:type" content="article" />
@@ -26,7 +27,7 @@ const Layout = (props) => {
           <a href="https://annexi-strayline.com/" className="navbar-brand">
             <img src={AS_Logo} height="35" alt="ANNEXI-STRAYLINE"></img>
           </a>
-          <div className="header-text text-white">Blog</div>
+          <Link to="/blog/" className="header-text text-white">Blog</Link>
         </div>
       </nav>
       <div id="content_area">{props.children}</div>

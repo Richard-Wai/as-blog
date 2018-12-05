@@ -1,17 +1,13 @@
 import React from 'react'
 import './list_item.scss'
+import TopicItem from './topic_item'
 
-const TopicItem = (props) => (
-  <span className="ListItem_topic">
-    #{props.topic}
-  </span>
-)
 const listItem = (props) => {
 
   const post = props.post
 
   const postTopics = post.topics.map((topic, index) => (
-    <TopicItem key={index} topic={topic} />
+    <TopicItem key={index} topic={topic} SelectTopic={props.SelectTopic} />
   ))
 
   return (

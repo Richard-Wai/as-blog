@@ -9,7 +9,7 @@
     {
       "title": "Should Have Used Ada (SHUA) #1 - Goto fail",
       "author": "Richard Wai",
-      "abstract": "The Should Have Used Ada (SHUA) series selects examples from the daily stream of vulnerabilities in common software, which are often due to the convolution of human error and programmer-biased language design. Ada's design, similar to double-entry accounting, applies technology to reduce the impact of our inherent weaknesses as humans. In this post, we look at how Ada could have prevented the infamous Goto fail vulnerability.",
+      "abstract": "In this post, we ponder how simply using Ada could have prevented the imfamous Goto Fail vulerability.",
       "topics": [
         "SHUA",
         "Ada",
