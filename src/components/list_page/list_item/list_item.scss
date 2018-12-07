@@ -26,9 +26,7 @@
 }
 
 .blogListItem:hover {
-  border-color: white;
-
-  
+  border-color: white; 
 }
 
 hr {
@@ -42,6 +40,10 @@ h2 {
   padding-top: 0.25em;
   height: 150px;
   overflow: hidden;
+
+  @include media-breakpoint-down(sm) {
+    height: 325px;
+  }
 }
 
 .author_name {

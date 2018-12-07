@@ -9,7 +9,7 @@
     {
       "title": "Should Have Used Ada (SHUA) #1 - Goto fail",
       "author": "Richard Wai",
-      "abstract": "In this post, we ponder how simply using Ada could have prevented the imfamous Goto Fail vulerability.",
+      "abstract": "Ada was designed from the beginning specifically for reliability and maintainability. The simple use of the Ada language can eliminate some of the most common software vulnerabilities. In the SHUA series, we use real examples to demonstrate why chosing Ada for your projects makes more sense than ever.",
       "topics": [
         "SHUA",
         "Ada",
