@@ -355,7 +355,7 @@
           "line": [
             {
               "emphasis": "none",
-              "segment": "The above function's role is to verify a key exchange, returning a status code (\"OSStatus\") declaring the result of the verification. We see that \"err\" is used as a running result from a string of hash operations. The idea being that if one of the operations should fail, then that specific failure code is dutifully returned. Unfortunately this means that as long as \"serverRandom\" and \"signedParams\" are successfully hashed, no actual comparison or verification is made thereafter, since the third goto statement is unconditionally executed, which then reports that the verification is \"OK\", even if it really isn't."
+              "segment": "The above function's role is to verify a key exchange, returning a status code (\"OSStatus\") declaring the result of the verification. We see that \"err\" is used as a running result from a string of hash operations. The idea being that if one of the operations should fail, then that specific failure code is dutifully returned. Unfortunately this means that as long as \"clientRandom\", \"serverRandom\", and \"signedParams\" are successfully hashed, no actual comparison or verification is made thereafter, since the fifth goto statement is unconditionally executed, which then reports that the verification is \"OK\", even if it really isn't."
             }
           ]
         }
