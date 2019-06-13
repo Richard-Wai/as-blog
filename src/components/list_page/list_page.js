@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { navigate } from 'gatsby'
+import { Link } from 'gatsby'
 import Layout from '../layout/layout'
 import ListItem from './list_item/list_item'
 import FilterTopic from './filter_topic'
@@ -127,14 +127,11 @@ class ListPage extends Component {
       );
 
     const postItems = finalPosts.map((post) => (
-      <div key={post.sequence}
-        onClick={() => navigate('/blog/posts/' + post.sequence)}>
+      <Link to={'/blog/posts/' + post.sequence} key={post.sequence}>
         <ListItem post={post}
           SelectTopic={topic => this.SelectTopic(topic)} />
-      </div>
+      </Link>
     ));
-
-    console.log(postItems);
 
     return (
       <Layout pageUrl={this.props.location.href} pageTitle="ANNEXI-STRAYLINE Blog" pageDescription="ANNEXI-STRAYLINE Blog Index">

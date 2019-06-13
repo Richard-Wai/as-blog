@@ -3,7 +3,13 @@
     "SHUA",
     "Ada",
     "Security",
-    "TLS"
+    "TLS",
+    "CVE",
+    "Authentication",
+    "polkit",
+    "systemd",
+    "Linux",
+    "Unix"
   ],
   "index": [
     {
@@ -18,6 +24,25 @@
       ],
       "sequence": 1,
       "image": "https://annexi-strayline.com/blog_assets/1/ada_rm_design_goals.jpg"
+    },
+    {
+      "title": "Should Have Used Ada (SHUA) #2 - Polkit gets \"confused\"",
+      "subtitle": "(Part 1)",
+      "author": "Richard Wai",
+      "abstract": "Recently, a serious vulnerability (CVE-2018-19788) appeared in the popular polkit authentication D-Bus service used on many Linux platforms, especially those running systemd. In this post we explore the root cause and focus on why Ada's type system would have prevented this kind of (common) flaw from ever arising in the first-place.",
+      "topics": [
+        "SHUA",
+        "Ada",
+        "Security",
+        "CVE",
+        "Authentication",
+        "polkit",
+        "systemd",
+        "Linux",
+        "Unix"
+      ],
+      "sequence": 2,
+      "image": "https://annexi-strayline.com/blog_assets/2/polkit_arch.png"
     }
   ]
 }

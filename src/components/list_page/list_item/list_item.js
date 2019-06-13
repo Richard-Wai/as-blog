@@ -14,15 +14,17 @@ const listItem = (props) => {
     ('post_header' in props) ?
       <div>
         <h1>{post.title}</h1>
+        <h3>{post.subtitle}</h3>
         <hr />
         <div className="author_name">{post.author}</div>
       </div> :
 
       <div className="blogListItem">
         <h1>{post.title}</h1>
+        <h3>{post.subtitle}</h3>
         <hr />
         <h2>{post.abstract}</h2>
-        <div className="d-flex topic_list">
+        <div className="topic_list">
           {postTopics}
         </div>
       </div>

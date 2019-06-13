@@ -16,11 +16,19 @@
 h1 {
   font-size: 2em;
   font-style: bold;
+  padding-top: 0.5em !important;
+  line-height: 1em !important;
 }
 
 h2 {
   font-size: 1.5em !important;
   font-style: bold;
+  
+}
+
+h3 {
+  font-size: 2em !important;
+  font-style: normal !important;
 }
 
 .blogFilters {

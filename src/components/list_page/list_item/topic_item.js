@@ -6,6 +6,7 @@ export default (props) => {
 
   return (
     <span className="ListItem_topic" onClick={(event) => {
+      event.preventDefault();
       event.stopPropagation();
       props.SelectTopic(props.topic)
     }}>

@@ -11,29 +11,42 @@ const elaborateBlock = (c) => (
   c.map((l, index) => {
     const line = l.line.map((seg, index) => {
       var segment_actual;
+
+      const prespace_count = ('prespace' in seg) ? seg.prespace : 0;
+      const prespace = " ".repeat(prespace_count)
+      const prespaced_segment = prespace + seg.segment
+
       switch (seg.emphasis) {
         case "bold":
-          segment_actual = <strong>{seg.segment}</strong>
+          segment_actual = <strong>{prespaced_segment}</strong>
           break
 
         case "italic":
-          segment_actual = <i>{seg.segment}</i>
+          segment_actual = <i>{prespaced_segment}</i>
+          break
+
+        case "underline":
+          segment_actual = <u>{prespaced_segment}</u>
           break
 
         case "highlight":
-          segment_actual = <span className="highlighted_text">{seg.segment}</span>
+          segment_actual = <span className="highlighted_text">{prespaced_segment}</span>
           break
 
         case "bold_highlight":
-          segment_actual = <strong className="highlighted_text">{seg.segment}</strong>
+          segment_actual = <strong className="highlighted_text">{prespaced_segment}</strong>
           break
 
         case "none":
-          segment_actual = <span>{seg.segment}</span>
+          segment_actual = <span>{prespaced_segment}</span>
+          break
+
+        case "break":
+          segment_actual = <br />
           break
 
         default:
-          segment_actual = <span />
+          throw new Error("Unrecognised emphasis value: " + seg.emphasis)
       }
 
       return ('link' in seg) ?
@@ -80,8 +93,10 @@ const Post = (props) => {
     <div key={`p-${index}`} className="post_paragraph">{elaborateParagraph(p)}</div>
   ))
 
+  const fullTitle = header.title + " " + header.subtitle;
+
   return (
-    <Layout pageUrl={props.location.href} pageTitle={header.title} pageDescription={header.abstract} pageImage={header.image}>
+    <Layout pageUrl={props.location.href} pageTitle={fullTitle} pageDescription={header.abstract} pageImage={header.image}>
       <section className="post_pushdown"></section>
       <section className="container">
 

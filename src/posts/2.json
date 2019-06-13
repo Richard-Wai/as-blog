@@ -1,0 +1,3539 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Recently, a "
+            },
+            {
+              "emphasis": "none",
+              "segment": "serious vulnerability",
+              "link": "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-19788"
+            },
+            {
+              "emphasis": "none",
+              "segment": " appeared in the freedesktop's \"polkit\" D-Bus service, which is used extensively by other services to authenticate requests received over D-Bus. A common example of such a service is the controversial but all-powerful systemd, via the associated systemctl cli."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "On the surface, the vulnerability bares the hallmarks of a classic integer overflow, however further analysis reveals something more interesting: an active limitation enforced by glib (as opposed to a simple C type-cast truncation/overflow one might expect). The end result is that on systems with 32-bit unsigned uid values (which is most of them), a regular user with a sufficiently high UID can steamroll right through polkit, causing it to erroneously authenticate the user as root, without even considering an authentication challenge. Any number of privileged services may rely on polkit for authentication. In the case of systemd, the magic user is able to arbitrarily execute any systemctl command with total impunity."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "This vulnerability, its misleading symptoms, and the band-aid patch that barely addresses it, are all excellent lessons in the importance of maintainability and readability in any large software project. While Ada has so far found its prestige in safety-critical software, it has always been designed as a general-purpose language. Yet, its unique focus on safety, readability, maintainability, and disciplined encapsulation offers an underappreciated benefit to mainstream software, and especially to open source projects. If polkit was originally implemented in Ada, this vulnerability would have been excluded by virtue of Ada's unique type system alone. Indeed, this kind of vulnerability is exactly the kind of frequent software failure that the Ada designers meticulously seek to eliminate through language design, rather than reliance on the programmer getting it right. But that is not the only benefit - keeping the codebase up-to-date with changing environments, such as the representation of a unix user ID, or changes to the predefined D-Bus services, becomes trivial and safe in Ada. Perhaps the most significant benefit, however, is the dramatic improvement to readability and encapsulation. When open source projects want to encourage contributors, what better way is there than to present a read-friendly codebase that is also well encapsulated, so that new contributors can make focused changes with confidence that they won't be destabilizing the larger project."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "It is telling that this bug was not found through anything like code review or auditing, or even testing - it was found through a runtime anomaly reported by a user. As our analysis below should make clear, the polkit codebase is a very common but frustrating example of unwieldy design, write-only coding, and a maintenance-ignorant approach to development. Worse still, the continual choice of grotesquely unsafe languages like C  and C++ helps neither maintainability, nor long-term stability."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Unfortunately, Ada was not selected for the implementation of polkit. Instead, C is the language of choice (because of course). Mixing C with a large project mostly maintained by volunteers unsurprisingly leads to a difficult to maintain mountain of interdependent modules, which very few maintainers (if any) will understand in its entirety. C does not provide any good way to protect dependent modules from changes in any one module's implementation. Ada, on the other hand, was specifically designed to facilitate large-scale, distributed development through language-enforced discipline (packages) and intuitive encapsulation (private types). C, meanwhile, allows anyone to step on everyone's toes on a whim, and often without reasonable blame. It is no surprise that critical fixes materialize as overly conservative band-aids, in lieu of broad-based breaking changes that would otherwise be needed to \"get it right\" (which is generally trivial in Ada). And let's be honest: no one is going to prioritize fixing patches to get them right if doing so only threatens the stability of the codebase. Thus the band-aid will likely remain a band-aid until the next band-aid further obscures the ever festering wad of those piled beneath it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "I'm not confused; you're confused!"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "The "
+            },
+            {
+              "emphasis": "none",
+              "segment": "patch",
+              "link": "https://gitlab.freedesktop.org/zbyszek/polkit/commit/fbaab32cb4ed9ed5f1e3eea6cd317d443aa427dc"
+            },
+            {
+              "emphasis": "none",
+              "segment": " for this vulnerability, though quick and immediately effective, is unabashedly a classic band-aid, according to the author:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "quote",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "italic",
+              "segment": "When a user or group above INT32_MAX is created, the numeric uid or gid wraps around to negative when the value is assigned to gint, and polkit gets confused. Let's refuse such uids and gids. "
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "italic",
+              "segment": "This patch just refuses to initialize uid and gid values to negative. A nicer fix is to change the underlying type to e.g. gint64 to allow the full range of values in uid_t and gid_t to be represented. But this cannot be done without breaking the API, so likely new functions will have to be added (a polkit_unix_user_new variant that takes a gint64, and the same for _group_new, _set_uid, _get_uid, _set_gid, _get_gid, etc.). This will require a bigger patch."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "This is a dangerous pattern that is apt to repeat itself. When a codebase is difficult to understand and suffers from decaying readability as a consequence of a constant stream of band-aid patches, vulnerabilities only become more likely, and increasingly hard to identify. As more such vulnerabilities are suddenly discovered after unknown periods as possible zero-day exploits, there is an immense time pressure to close the hole as quickly as possible. Typically this means another indirect patch, which makes the codebase even less readable, and more complex. Ultimately the result is a runaway process where unreadable code becomes more unreadable as more band-aid fixes are continually rushed in, often obfuscating the underlying cause, which is less and less likely to be understood by the author of the next patch. To add insult to injury, the codebase becomes increasingly unstable, as continued indirect patching leads to ever more complicated (fragile) interactions. The more complex the interactions are between components of the codebase, the more prone the project becomes to unexpected results, incorrect assumptions, and hidden dangers for future maintainers."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Polkit generally, and this patch particularly, are great examples of this process in action. The patch does nothing to enable the correct behavior (if 4000000000 is a valid uid for the system, it should be for polkit). Instead the patch simply denies any values outside of polkit's native (but totally inappropriate) signed representation (a \"gint\") of a uid value."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "The author proposes that a \"better approach\" might be to change the internal uid representation to a 64-bit signed number, but that this \"cannot be done without breaking the API\". This is interesting because it is also a band-aid, and an ugly one at that - the value coming in is an unsigned 32-bit value, so by type-casting it to a 64-bit signed, we avoid an integer overflow. But what would happen if Linux started to adopt 64-bit (unsigned) uids? Unlikely, but not unthinkable."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "Walking through walls"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Here is an "
+            },
+            {
+              "emphasis": "none",
+              "segment": "original posting",
+              "link": "https://github.com/systemd/systemd/issues/11026"
+            },
+            {
+              "emphasis": "none",
+              "segment": " of the issue and how to reproduce it. We see a user set up with an id of 4000000000, which is a run-of-the-mill unprivileged user. This user then asks systemd, via systemctl, to stop the ssh server."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "$ id"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "uid=4000000000(someuser) gid=100(users) groups=100(users)"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "$ systemctl stop sshd.service"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "(pkttyagent:3342): GLib-GObject-WARNING **: 13:28:53.802: value \"-294967296\" of type 'gint' is invalid or out of range for property 'uid' of type 'gint' **"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "ERROR:pkttyagent.c:156:main: assertion failed: (polkit_unix_process_get_uid (POLKIT_UNIX_PROCESS (subject)) >= 0)"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "$ systemctl is-active sshd.service"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "inactive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Looking at the output of a vulnerable polkit's pkttyagent, one may be quick to suspect either pkttyagent itself, or perhaps some kind of glitch in the interaction between polkitd and pkttyagent. But in fact, authentication as root is inevitable from the very moment systemd asks polkit to authenticate the \"subject\" (systemctl running under the magic user). Once this process starts, it cannot be stopped. Even if the agent is terminated, or there is no agent at all, polkit will have already decided that the user is root before it even looks for one. "
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "Agent Smith has Déjà vu"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "When systemctl is invoked, and asked to execute a privileged command (stop in this case), it defers to a configurable subsystem for authentication. In most mainstream Linux distributions, systemd (and hence systemctl) is configured at build-time to handle this through polkit, and thus systemctl invokes a suitable polkit \"authentication agent\" (pkttyagent in this case), as a \"fallback\" agent in case an existing authentication agent is not already registered for the subject's D-Bus session. If an agent is already registered for the subject's session, that will be used instead. You can see this in action by attempting to invoke a privileged systemctl command from a terminal window in a graphical environment. Doing so typically invokes a pop-up window for authentication, outside the terminal. If no other authentication agent is registered for the session, pkttyagent will be ready and waiting for the job over the terminal itself."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Regardless of any existing authentication agents that may already exist on the session, systemctl always forks and execs pkttyagent, giving us a somewhat misleading sense that systemctl or systemd ignored the death of pkttyagent. In fact, in normal cases, pkttyagent dying should not be a problem. If polkit decides that the an authentication challenge is needed, and finds that there is no authentication agent on the subject's end, authentication will simply fail."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "If we modify pkttyagent to kill itself immediately, and then invoke systemctl stop with a more typical unprivileged user (say with a uid in the 2,000 - 3,000 range) over ssh (forcing pkttyagent to be the only agent on the session), we get this:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "$ systemctl stop sshd.service"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Failed to stop sshd.service: Interactive authentication required."
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "See system logs and 'systemctl status sshd.service' for details."
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "$ systemctl is-active sshd.service"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "active"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Polkit rightly notices that there is no authentication agent available, and declines to authenticate the subject."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Yet the exact same modified pkttyagent, again over ssh, but with our magic user (uid = 4000000000), looks like this:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "$ systemctl is-active sshd.service"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "active"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "$ systemctl stop sshd.service"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "$ systemctl is-active sshd.service"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "inactive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Not a peep. Polkit let us right through. It didn't even care that there was no agent at all. It didn't seem to think the usual authentication challenge was necessary.."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Interesting."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "Questionable authority"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "At the heart of polkitd authentication lies a number of pluggable \"backend authorities\". The backend authorities are modules that allow logic of arbitrary complexity to decide if any given \"subject\" (e.g. systemctl) is authenticated for interaction with the \"caller\" (e.g.  systemd), at request of the caller, over D-Bus. For most off-the-shelf deployments (such as most Linux distributions), the generic \"interactive authority\" module, included with polkit, takes charge of managing authentication. The job of the interactive authority is to decide if the subject is: already authenticated;  authenticated by default (root); or, due for an authentication challenge. If the interactive authority decides a challenge is required, it attempts to collect an "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "interactive"
+            },
+            {
+              "emphasis": "none",
+              "segment": " challenge response (typically a password) from an available authentication agent (such as pkttyagent) attached to the subject's D-Bus session."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "When polkitd is asked to authenticate a subject on behalf of a caller, it invokes the relevant \"backend authority\" via its "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "check_authorization"
+            },
+            {
+              "emphasis": "none",
+              "segment": " interface method ("
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_backend_ interactive_authority_  check_authorization",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendinteractiveauthority.c#L834"
+            },
+            {
+              "emphasis": "none",
+              "segment": "  in the case of the interactive authority). This method receives a handle for the subject and the caller, and is responsible for carrying out the actual authorization process."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "One of the "
+            },
+            {
+              "emphasis": "none",
+              "segment": "first actions",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendinteractiveauthority.c#L910"
+            },
+            {
+              "emphasis": "none",
+              "segment": " taken by "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_backend_ interactive_authority_ check_authorization"
+            },
+            {
+              "emphasis": "none",
+              "segment": " is to collect the local user information for both the caller, and perhaps more problematically, the subject, via a call to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_backend_session_monitor_ get_user_for_subject",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendsessionmonitor.c#L293"
+            },
+            {
+              "emphasis": "none",
+              "segment": ":"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "user_of_subject = polkit_backend_session_monitor_ get_user_for_subject"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 21,
+              "segment": "(priv->session_monitor,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 22,
+              "segment": "subject, &user_of_subject_matches,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 22,
+              "segment": "&error);"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "italic",
+              "segment": "polkit_backend_session_monitor_ get_user_for_subject"
+            },
+            {
+              "emphasis": "none",
+              "segment": "'s job, as the name implies, is to determine the user behind the subject's session (i.e. the user making the systemctl request). For our magic user, this call will ultimately misidentify the subject user as root."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Unfortunately, this is a red herring. It turns-out that this initial call to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_backend_session_monitor_ get_user_for_subject"
+            },
+            {
+              "emphasis": "none",
+              "segment": " is not actually used to authenticate subject, it is only there for a for some sanity checks (which pass). The real action begins at the "
+            },
+            {
+              "emphasis": "none",
+              "segment": "later call",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendinteractiveauthority.c#L981"
+            },
+            {
+              "emphasis": "none",
+              "segment": " to the aptly named "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "check_authorization_sync"
+            },
+            {
+              "emphasis": "none",
+              "segment": ":"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "result = check_authorization_sync (authority,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 35,
+              "segment": "caller,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 35,
+              "segment": "subject,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 35,
+              "segment": "action_id,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 35,
+              "segment": "details,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 35,
+              "segment": "flags,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 35,
+              "segment": "&implicit_authorization,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 35,
+              "segment": "FALSE, /* checking_imply */"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 35,
+              "segment": "&error);"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "Down the rabbit hole"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "italic",
+              "segment": "Check_authorization_sync",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendinteractiveauthority.c#L1059"
+            },
+            {
+              "emphasis": "none",
+              "segment": "'s job is to make the determination (\"synchronously\") on the current authorization state of the subject: already authorized; not authorized (denied); or, in need of a challenge (potentially authorized).  It ends up making its"
+            },
+            {
+              "emphasis": "none",
+              "segment": " own call to ",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendinteractiveauthority.c#L1121"
+            },
+            {
+              "emphasis": "italic",
+              "segment": " polkit_backend_session_monitor_ get_user_for_subject"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", to exactly the same erroneous determination (user of subject is root):"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "/* every subject has a user; this is supplied by the client, so we rely"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " * on the caller to validate its acceptability. */"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "user_of_subject = polkit_backend_session_monitor_ get_user_for_subject"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 21,
+              "segment": "(priv->session_monitor,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 22,
+              "segment": "subject, NULL,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 22,
+              "segment": "error);"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "But why? Why does "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_backend_session_monitor_ get_user_for_subject"
+            },
+            {
+              "emphasis": "none",
+              "segment": " say the magic user is root, when it definitely isn't? The function's job is to return a \"PolkitIdentity\" glib object that is derived from a few possible sources depending on what form the \"subject\" takes. The subject will be one of: a unix process; a D-Bus name; or, a D-Bus session. In the case of systemctl, "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_backend_session_monitor_ get_user_for_subject "
+            },
+            {
+              "emphasis": "none",
+              "segment": "determines",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendsessionmonitor.c#L328"
+            },
+            {
+              "emphasis": "none",
+              "segment": " the subject to be a D-Bus name, i.e. POLKIT_IS_SYSTEM_BUS_NAME will evaluate TRUE for subject. This makes sense, as we want to know the user at the other end of the request, which arrived over D-Bus."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "else if"
+            },
+            {
+              "emphasis": "none",
+              "segment": " (POLKIT_IS_SYSTEM_BUS_NAME (subject))"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "{"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "ret = (PolkitIdentity*)polkit_system_bus_name_get_user_sync (POLKIT_SYSTEM_BUS_NAME (subject), NULL, error);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "matches = TRUE;"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "The buck then gets passed down into "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_system_bus_name_ get_user_sync",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkit/polkitsystembusname.c#L500"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", which is given a D-Bus bus name, and is trusted to return the user \"identity\" of the process who registered that bus name. Note that we have gone down a level of abstraction from PolkitIdentity to a bona-fide PolkitUnixUser. Looks like we’re getting warmer."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "PolkitUnixUser *"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "polkit_system_bus_name_get_user_sync (PolkitSystemBusName  *system_bus_name,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 38,
+              "segment": "GCancellable         *cancellable,"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 38,
+              "segment": "GError              **error)"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "{"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "PolkitUnixUser *ret = NULL;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "highlight",
+              "segment": "guint32 uid;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "g_return_val_if_fail (POLKIT_IS_SYSTEM_BUS_NAME (system_bus_name), NULL);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), NULL);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "g_return_val_if_fail (error == NULL || *error == NULL, NULL);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if"
+            },
+            {
+              "emphasis": "none",
+              "segment": " (!"
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "polkit_system_bus_name_get_creds_sync"
+            },
+            {
+              "emphasis": "none",
+              "segment": " (system_bus_name, "
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "&uid"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", NULL,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 44,
+              "segment": "cancellable, error))"
+            }
+          ]
+        },
+        {
+          "indent": 2,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto"
+            },
+            {
+              "emphasis": "none",
+              "segment": " out;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "ret = (PolkitUnixUser*)"
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "polkit_unix_user_new (uid);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " out:"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "return"
+            },
+            {
+              "emphasis": "none",
+              "segment": " ret;"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "This is starting to get interesting. The function sets up a \"guint32\" value for uid, which is intriguing because the uid values elsewhere in polkit are always regular (signed) gint values. Though obviously problematic, there seems to be a clear motive for this. To obtain the uid associated with the bus name, "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_system_bus_name_ get_creds_sync"
+            },
+            {
+              "emphasis": "none",
+              "segment": " makes a call to the D-Bus interface "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "org.freedesktop. DBus.GetConnectionUnixUser"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", which according to the "
+            },
+            {
+              "emphasis": "none",
+              "segment": "D-Bus specification",
+              "link": "https://dbus.freedesktop.org/doc/dbus-specification.html"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", returns the uid as a \"UINT32\". Which is not surprising, since this is often the actual type of uids at the system level, and also because negative uid values have never been legal in unix."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Unfortunately, as technically correct as a guint32 might be for the uid, it gets passed directly to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_unix_user_new",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkit/polkitunixuser.c#L197"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", which if we have a quick look at the declaration, we find "
+            },
+            {
+              "emphasis": "underline",
+              "segment": "takes an argument of type gint!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "/**"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " * polkit_unix_user_new:"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " * @uid: A UNIX user id."
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " *"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " * Creates a new #PolkitUnixUser object for @uid."
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " * Returns: (transfer full): A #PolkitUnixUser object. Free with g_object_unref()."
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " */"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "PolkitIdentity *"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "polkit_unix_user_new "
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "(gint uid)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "We don't even have a type-cast from guint32 to gint, not that it matters (besides supressing warnings). Obviously mismatched parameter types should be illegal (like they are in Ada), but they aren't in C. Besides, a C type-cast merely transfers bits, and totally disregards the actual value. Contemporarily, int will typically be 32-bit, so a type-cast would be a direct bit-for-bit copy anyways. With or without a explicit type-cast, the value going in can get mangled. For our magic user, that is exactly what happens."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Had this been written in Ada, it would either be illegal at compile time, or a run-time check would be inserted. More on that later."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "Do you know who this is?"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "It was a long, convoluted trace, but we have finally arrived at ground zero. Our large guint32 uid is passed into "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_unix_user_new"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", which expects a signed value that is almost always going to be the same bit-width. A classic integer overflow situation ensues, and we enter into the function with a negative uid. Don't worry, the hopelessly over-engineered bolt-on object-oriented C wonder library "
+            },
+            {
+              "emphasis": "none",
+              "segment": "glib",
+              "link": "https://developer.gnome.org/glib/"
+            },
+            {
+              "emphasis": "none",
+              "segment": " has us covered (see part 2 for more on this dumpster fire of a library)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Inside the "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_unix_user_new",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkit/polkitunixuser.c#L197"
+            },
+            {
+              "emphasis": "none",
+              "segment": " function we find an incredibly simple dispatching operation:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "PolkitIdentity *"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "polkit_unix_user_new (gint uid)"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "{"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "return POLKIT_IDENTITY (g_object_new (POLKIT_TYPE_UNIX_USER,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 38,
+              "segment": "\"uid\", uid,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 38,
+              "segment": "NULL));"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "This operation calls into glib to set-up a shiny new POLKIT_TYPE_UNIX_USER data structure (excuse me, \"object\"), to be initialized with the (negative) gint uid value that just came in. The glib designers were creative enough to build-in an entirely separate type system with their bolt-on object orientation. This type system allows these object oriented \"types\" (like POLKIT_TYPE_UNIX_USER) to be assigned any number of \"properties\" (values), which can only be assigned and retrieved through calls to user-defined \"methods\". Pretty typical object oriented paradigm, but why not just use C++?"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "The above call to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "g_object_new"
+            },
+            {
+              "emphasis": "none",
+              "segment": " first allocates the object, and then runs the appropriate constructor - in this case"
+            },
+            {
+              "emphasis": "italic",
+              "segment": "\"polkit_unix_user_class_init\"",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkit/polkitunixuser.c#L129"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", which looks like this:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "static void"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "polkit_unix_user_class_init (PolkitUnixUserClass *klass)"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "{"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "GObjectClass *gobject_class = G_OBJECT_CLASS (klass);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "gobject_class->finalize = polkit_unix_user_finalize;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "gobject_class->get_property = polkit_unix_user_get_property;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "gobject_class->set_property = polkit_unix_user_set_property;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "/**"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " * PolkitUnixUser:uid:"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " *"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " * The UNIX user id."
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": " */"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "g_object_class_install_property (gobject_class,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 33,
+              "segment": "PROP_UID,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 33,
+              "segment": "g_param_spec_int (\"uid\","
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 51,
+              "segment": "\"User ID\","
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 51,
+              "segment": "\"The UNIX user ID\","
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 51,
+              "segment": "0,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 51,
+              "segment": "G_MAXINT,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 51,
+              "segment": "0,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 51,
+              "segment": "G_PARAM_CONSTRUCT |"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 51,
+              "segment": "G_PARAM_READWRITE |"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 51,
+              "segment": "G_PARAM_STATIC_NAME |"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 51,
+              "segment": "G_PARAM_STATIC_BLURB |"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 51,
+              "segment": "G_PARAM_STATIC_NICK));"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "This constructor is actually responsible for registering the properties of this type, namely the uid property. The call to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "g_object_class_install_property"
+            },
+            {
+              "emphasis": "none",
+              "segment": " defines the name and quasi type of this property. The name is PROP_UID, and the type is defined as a special integer parameter specification, supplied via a call to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "g_param_spec_int"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", which maps to a gint value (the actual type), with a specified range (thus a quasi-type). The "
+            },
+            {
+              "emphasis": "none",
+              "segment": "glib documentation",
+              "link": "https://developer.gnome.org/gobject/stable/gobject-Standard-Parameter-and-Value-Types.html#g-param-spec-int"
+            },
+            {
+              "emphasis": "none",
+              "segment": " tell us what the above parameters are."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "It would be nice to have parameter naming for this call to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "g_param_spec_int"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", as would be possible in Ada. Parameter naming is a great example of read-friendly code. While it adds some verbosity, no one can argue against its clear benefits to the uninitiated (or rusty) reader. It's hard to appreciate parameter naming as the writer, but the benefits are eminently obvious to maintainers, old hands or new hands. Software spends more time being maintained than written - so this approach makes a lot of sense."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Let's envision how a call to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "g_param_spec_int"
+            },
+            {
+              "emphasis": "none",
+              "segment": " might look like in Ada, so that we can take a clear look at the different values chosen for the \"PROP_UID\" property of the PolkitUnixUser \"type\":"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "g_param_spec_int (name          => \"uid\","
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 18,
+              "segment": "nick          => \"User ID\","
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 18,
+              "segment": "blurb         => \"The UNIX user ID\","
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 18,
+              "segment": ""
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "minimum       => 0,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 18,
+              "segment": ""
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "maximum       => G_MAXINT,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 18,
+              "segment": "default_value => 0,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 18,
+              "segment": "flags         => (G_PARAM_CONSTRUCT,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 36,
+              "segment": "G_PARAM_READWRITE,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 36,
+              "segment": "G_PARAM_STATIC_NAME,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 36,
+              "segment": "G_PARAM_STATIC_BLURB,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 36,
+              "segment": "G_PARAM_STATIC_NICK));"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Those maximum and minimum parameters are key. It turns out that "
+            },
+            {
+              "emphasis": "underline",
+              "segment": "setting the \"uid\" property on a PolkitUnixUser will be silently limited to be in that range."
+            },
+            {
+              "emphasis": "none",
+              "segment": " If the uid property is set with a negative value (as it is in the case of our magic user), the glib library confidently and silently says \"nope, too low\", intervenes, and "
+            },
+            {
+              "emphasis": "underline",
+              "segment": "sets the uid to zero instead"
+            },
+            {
+              "emphasis": "none",
+              "segment": " - root!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "After running the constructor, the initial call to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "g_object_new"
+            },
+            {
+              "emphasis": "none",
+              "segment": " then sets tries to set uid property to the given value, will then get limited if needed. Of course, our magic user gets \"limited\" to 0, and thus the \"PolkitIdentity\" returned will cause "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "Polkit_Identity_Is_Root"
+            },
+            {
+              "emphasis": "none",
+              "segment": " to evaluate to true. This PolkitIdentity object is dutifully passed all the way back to the backend authority, or more importantly to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "check_authorization_sync"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", which tries to determine if an authentication challenge is required for the subject. It finds that "
+            },
+            {
+              "emphasis": "none",
+              "segment": "decision",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendinteractiveauthority.c#L1127"
+            },
+            {
+              "emphasis": "none",
+              "segment": " to be an easy one:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "/* special case: uid 0, root, is _always_ authorized for anything */"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if"
+            },
+            {
+              "emphasis": "none",
+              "segment": " (identity_is_root_user (user_of_subject))"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "{"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "result = polkit_authorization_result_new (TRUE, FALSE, NULL);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto"
+            },
+            {
+              "emphasis": "none",
+              "segment": " out;"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Special case indeed!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Again, it would be nice to have Ada parameter naming to make better sense of what the \"authorization result\" looks like. In Ada, it could look like this: "
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if"
+            },
+            {
+              "emphasis": "none",
+              "segment": " Identity_Is_Root_User (User_Of_Subject) "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "then"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Result := Polkit_Authorization_Result_New (Is_Authorized => True,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 43,
+              "segment": "Is_Challenge  => False,"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 43,
+              "segment": "PolkitDetails => null);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "goto"
+            },
+            {
+              "emphasis": "none",
+              "segment": " Cleanup_And_Exit;  -- out is a reserved word in Ada"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end if;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "So we see here that if "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "check_authorization_sync"
+            },
+            {
+              "emphasis": "none",
+              "segment": " determines the user to be root (uid 0), then it returns an instruction saying - yes this user is authorized, and you don't need to do an authentication challenge (no need to ask for a password!)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "So back in "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "polkit_backend_ interactive_authority_ check_authorization",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendinteractiveauthority.c#L834"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", we have the final check before approving the action - to see if "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "check_authorization_sync ",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendinteractiveauthority.c#L981"
+            },
+            {
+              "emphasis": "none",
+              "segment": "determined",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendinteractiveauthority.c#L999"
+            },
+            {
+              "emphasis": "none",
+              "segment": " that we need to do a challenge (and invoke the subject's authentication agent):"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "/* Caller is up for a challenge! With light sabers! Use an authentication agent if one exists... */"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "if"
+            },
+            {
+              "emphasis": "none",
+              "segment": " (polkit_authorization_result_get_is_challenge (result) &&"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 4,
+              "segment": "(flags & POLKIT_CHECK_AUTHORIZATION_FLAGS_ALLOW_USER_INTERACTION))"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "{"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "AuthenticationAgent *agent;"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "agent = get_authentication_agent_for_subject (interactive_authority, subject);"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "But of course since Is_Challenge is false (for the result of "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "check_authorization_sync"
+            },
+            {
+              "emphasis": "none",
+              "segment": "), no challenge happens, and the authentication result (Is_Authorized = True, Is_Challenege = False) is "
+            },
+            {
+              "emphasis": "none",
+              "segment": "passed back up",
+              "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkitbackend/polkitbackendinteractiveauthority.c#L1032"
+            },
+            {
+              "emphasis": "none",
+              "segment": " until eventually polkit tells systemd that the subject is authorized."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "The end result is that no authentication agent is invoked at all, and the magic user is now fully authenticated and authorized (as root). This is why, even when pkttyagent terminates due to the failed assertions, it does absolutely nothing to prevent the erroneous authentication as root. Polkit doesn't care if there is an agent available at all."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "Real talk."
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "There is no denying that these kinds of bugs are common. Thery are extremely hard to find with testing or by code review, and are probably more numerous that the software community would like to admit."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Of course, like most vulnerabilities of this magnitude, there is a confluence of factors involved. There are clearly issues with readability, and the ability to make changes properly and safely (more on that in part 2). Many of these issues stem from fundamental flaws of the chosen language. C is universally recognised to be unsafe, but worse still it is not designed in any sense to facilitate maintenance, large teams, or any kind of significant abstraction. Furthermore, many other popular languages consistently fail to recognise that humans make mistakes frequently. Many languages seem to take the position that the programmer \"should know what they are doing\", and \"if they make this mistake, it is their fault\"."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ada is unique because it was founded on the recognition that programming is a human activity. Ada is designed to facilitate the strengths of human creativity, through intuitive and powerful systems of abstraction, encapsulation, information hiding, and data modeling. Ada is designed to deal with the things that humans are so bad at doing, such as accidentally leaving out symbols (like C's '==' vs '='), spotting subtle differences (**ptr vs *ptr), or assuming that an incoming value is always going to be correct and valid (the root cause of most buffer overflows). Us humans are not likely to get better at these things, and worse still, we tend to overestimate our own skills and abilities to avoid these kinds of errors."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "The genius of the Ada type system"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "The Ada type system is all about "
+            },
+            {
+              "emphasis": "underline",
+              "segment": "actual values, not representations."
+            },
+            {
+              "emphasis": "none",
+              "segment": " The Ada type system is designed to model data, rather than modeling storage in memory. The compiler handles the machine representation of types automatically, and the language rules ensure that "
+            },
+            {
+              "emphasis": "underline",
+              "segment": "values never magically change."
+            },
+            {
+              "emphasis": "none",
+              "segment": " This is obviously rational, but Ada is definitely in the minority for taking this approach. Most popular languages (including Rust), present types directly as machine types. Unless you are deliberately trying to manipulate flags in a register "
+            },
+            {
+              "emphasis": "none",
+              "segment": "(Ada is much better than C at that anyways)",
+              "link": "http://www.ada-auth.org/standards/rm12_w_tc1/html/RM-13-5-1.html"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", it makes little sense to be trying to decide if a type should be 16-bit or 32-bit, signed or unsigned. In Ada, the programmer is encouraged to focus on what values are actually being stored (not how), and what those values mean in relation to others (5 degrees vs. 5 km/h)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Let's look at this polkit authentication disaster from an Ada perspective. We can take two approaches: one is where gint and guint32 are two distinct types; the other is where gint and guint32 are subtypes representing different constraints of the same type."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "The first approach is the most rational. It doesn't really make sense to make gint and guint32 subtypes of the same type, since they are conceptually distinct (machine types with different representations). In Ada, we'd probably expect to have a uid type, with perhapse some constrained subtypes like \"non_root_uid\", with a range of 1 .. uid'Last. This would allow programming by contract where specific subprograms could exclude root uids, for example. However, in this example we are trying to make a more direct comparison between Ada and the typical C-like \"everything is a machine type\" world. We will revisit the powerful applications of Ada data modeling concepts in part two. The point here is to transliterate the C code directly to Ada, and show how Ada would still catch the bug anyways."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Since we "
+            },
+            {
+              "emphasis": "none",
+              "segment": "know",
+              "link": "https://developer.gnome.org/glib/stable/glib-Basic-Types.html#gint"
+            },
+            {
+              "emphasis": "none",
+              "segment": " that gint is the same as C's standard int type "
+            },
+            {
+              "emphasis": "none",
+              "segment": ", let's just define it as such:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "with"
+            },
+            {
+              "emphasis": "none",
+              "segment": " Interfaces.C;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "subtype "
+            },
+            {
+              "emphasis": "none",
+              "segment": "gint"
+            },
+            {
+              "emphasis": "bold",
+              "segment": "    is "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Interfaces.C.int;"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "type    "
+            },
+            {
+              "emphasis": "none",
+              "segment": "guint32"
+            },
+            {
+              "emphasis": "bold",
+              "segment": " is mod "
+            },
+            {
+              "emphasis": "none",
+              "segment": "2**32;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Here we've declared guint32 as a modular type, which has a range of 0 .. (2**32 - 1) - i.e. an unsigned 32-bit number. We could also have declared it as an integer with a finite range (type guint32 is range 0 .. 2**32 - 1). However, a modular type is a more \"apples-to-apples\" analogue to an unsigned integer in C. Using a finite range has benefits, as it excludes wrap-around overflow conditions."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Let's assume we try to do the same thing as in the actual polkit code, where the \"actual parameter\" (what is passed in by the caller) for uid is a guint32, while the \"formal parameter\" (what is expected by callee) is a gint:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "function "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Polkit_Unix_User_New ("
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "uid: gint"
+            },
+            {
+              "emphasis": "none",
+              "segment": ") "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "return "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Polkit_Unix_User;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "function "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Polkit_System_Bus_Name_Get_User_Sync (System_Bus_Name: in Polkit_System_Bus_Name;"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "prespace": 47,
+              "segment": "Cancellable: in out G_cancellable)"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "prespace": 45,
+              "segment": "return "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Polkit_Unix_User"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "is"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "highlight",
+              "segment": "uid: guint32;"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "begin"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Polkit_System_Bus_Name_Get_Creds_Sync (…, uid, …);"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "-- …"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "return "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Polkit_Unix_User_New ("
+            },
+            {
+              "emphasis": "highlight",
+              "segment": "uid"
+            },
+            {
+              "emphasis": "none",
+              "segment": ");"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "exception"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "when others "
+            },
+            {
+              "emphasis": "none",
+              "segment": "=>"
+            }
+          ]
+        },
+        {
+          "indent": 1,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "return "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Null_Unix_User;"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "end "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Polkit_System_Bus_Name_Get_User_Sync;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "underline",
+              "segment": "This would be rejected at compile time."
+            },
+            {
+              "emphasis": "none",
+              "segment": " In Ada it is simply illegal to provide an actual parameter that is a different type from the formal (expected) parameter. gint and guint32 are two distinct types, and thus a call to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "Polkit_Unix_User_New"
+            },
+            {
+              "emphasis": "none",
+              "segment": " with a guint32 value for the uid parameter is rejected at compile-time."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "But what about a type-cast? "
+            },
+            {
+              "emphasis": "underline",
+              "segment": "Actual type-casts in Ada are deliberately cumbersome, and almost never used."
+            },
+            {
+              "emphasis": "none",
+              "segment": " They require a very inconvenient and conspicuous instantiation of a generic function \"Ada.Unchecked_Conversion\", and are indented for very specialised, rare, low-level operations. Ada does this because type-casts are incredibly dangerous, and should only ever be used where their behavior (bit-for-bit copying) is specifically need - which is very rare. By taking this approach, Ada also makes it easy to find any such instances of Unchecked_Conversion, and audit their use.  Meanwhile in C, type-casts a way of life, and auditing their use is much less practical. They are also often responsible for causing very bad things. In this vulnerability, we even have a type-cast by default, which is extra bad."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Instead of normalizing type-casts like C does, Ada has the concept of "
+            },
+            {
+              "emphasis": "underline",
+              "segment": "type conversions"
+            },
+            {
+              "emphasis": "none",
+              "segment": " instead. Type conversions are a foundational concept of Ada's exceptional type safety. In Ada, the binary representation is typically the responsibility of the compiler, while the language focuses on actual values. When assigning a value from one object to another, Ada always ensures that the "
+            },
+            {
+              "emphasis": "underline",
+              "segment": "actual value"
+            },
+            {
+              "emphasis": "none",
+              "segment": " of the source is assigned, "
+            },
+            {
+              "emphasis": "underline",
+              "segment": "not the representation"
+            },
+            {
+              "emphasis": "none",
+              "segment": ". Type conversions are about the conversion of values, and are totally agnostic to the underlying binary representation. This distinction is important, and is actually more intuitive than the behaviour of a type-cast. That's surely one reason type-casts cause so many problems."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Ada type conversions have an entire "
+            },
+            {
+              "emphasis": "none",
+              "segment": "section",
+              "link": "http://www.ada-auth.org/standards/rm12_w_tc1/html/RM-4-6.html"
+            },
+            {
+              "emphasis": "none",
+              "segment": " dedicated to them in the Ada standard. Value conversion rules are precisely prescribed. In fact, the section on type conversions has no \"Implementation Permissions\" subclause, implementation-defined behaviour, representational dependencies, or any undefined behavior at all. That's what safety looks like."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "We could attempt to make the above assignment legal by using a type conversion to convert (the value of) uid to the expected gint type at the point of call, like this:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "return "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Polkit_Unix_User_New (gint (uid));"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "That would make the call legal in this case, but that is not the end of the story. Unlike C, the Ada compiler will not just assume that the programmer knows what they are doing. There are a significant set of rules that must be satisfied, and not all type conversions are legal. Though in this case we have a fairly vanilla conversion between two integer types, the Ada compiler will still look at this and ask itself: \"are there any possible values of guint32 that would not be in the "
+            },
+            {
+              "emphasis": "underline",
+              "segment": "range"
+            },
+            {
+              "emphasis": "none",
+              "segment": " of gint?\" In this case answer will be \"yes\"!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "If we consider a typical definition of C.int (a 32-bit representation) the actual Ada type definition of Interfaces.C.int  might look like this:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "type"
+            },
+            {
+              "emphasis": "none",
+              "segment": " int "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "is range "
+            },
+            {
+              "emphasis": "none",
+              "segment": "-2_147_483_648 .. 2_147_483_647"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "prespace": 2,
+              "segment": "with "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Size => 32;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Our own definition of guint32 means that it has an effective range of 0 .. 4_294_967_295 (2^32 - 1). Alas, the compiler knows statically that there exists valid guint32 values which are not valid gint values (any value of uid > 2_147_483_647   - i.e. gint'Last). The Ada standard mandates that a run-time check must be inserted to check the value of uid at the point of the type conversion. If the compiler knew statically that there would never be a value of guint32 that would be invalid for gint, it can optimize away the check. If it knew that there would never be a valid value, it will probably complain and tell us to expect an exception at run-time, or reject the compilation entirely. In this case, if at run time, uid is greater than 2_147_483_647, a Constraint_Error exception is raised at the attempt to convert the value. In the case of this vulnerability, that is exactly what would have happened. Our magic uid of 4_000_000_000 is a valid value of guint32, but it is out of range the range of valid values for gint. Even if the underlying representation is valid for both, Ada always treats values in absolute terms - a positive value could never equate (or be converted to) a negative value."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Take a moment to consider how common these kinds of bugs are: overflows, improper type-casting, and positive numbers being erroneously interpreted as signed negative values. These kinds of bugs often come with serious consequences, as in this case. Such errors are basically impossible in Ada, unless you are very determined, or are too quick to disable runtime checks. While disabling runtime checks might make sense in some particularly constrained embedded systems, it would be silly to turn them off in something mainstream like polkit."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "To be sure"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "How about the second option, where both guint32 and gint are subtypes of the same type? This approach is awkward, but it is somewhat more similar to the actual C code, and it again demonstrates that Ada would still catch the bug regardless. To start, we'll need a parent type that can handle the ranges of both subtypes. That basically means the parent type must be at least 64-bits wide, and signed (the patch author agrees):"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "type "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Signed_64 "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "is range "
+            },
+            {
+              "emphasis": "none",
+              "segment": "-2**63+1 .. +2**63-1;"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "subtype "
+            },
+            {
+              "emphasis": "none",
+              "segment": "gint "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "   is "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Signed_64 "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "range "
+            },
+            {
+              "emphasis": "none",
+              "segment": "-2**31+1 .. +2**31-1;"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "subtype "
+            },
+            {
+              "emphasis": "none",
+              "segment": "guint32 "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "is "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Signed_64 "
+            },
+            {
+              "emphasis": "bold",
+              "segment": "range "
+            },
+            {
+              "emphasis": "none",
+              "segment": "0 .. 2**32-1;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Notice how guint32 includes positive values that are greater than the maximum positive values of gint. Of course we know this, since an unsigned value can make use of the most significant bit to get a additional magnitude of values."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Now if we retry the same code as our first try above (without a type conversion):"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "bold",
+              "segment": "return "
+            },
+            {
+              "emphasis": "none",
+              "segment": "Polkit_Unix_User_New (uid);"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "underline",
+              "segment": "This would be legal"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", and is more technically similar to what is happening in the actual C code. However, the Ada compiler will still check that the subtype for uid (guint32) is a subtype of the type as gint (which it is), and that the ranges of guint32 overlap that of gint (they do). Additionally, If the compiler was able to determine that the subtype of guint32 was completely within the range of gint, it could (and probably would) elect to omit a run-time check. However, in this case, there is a large range of values of guint32 that are not valid for gint. One of those values happens to be 4000000000 - the uid of our magic user. Knowing this, the Ada compiler "
+            },
+            {
+              "emphasis": "underline",
+              "segment": "is required"
+            },
+            {
+              "emphasis": "none",
+              "segment": " to insert a run-time check here to ensure that the actual value of uid at the point of call is a valid value for the subtype of the formal parameter (a gint). And once again, our magic user would fail that check, and a Constraint_Error would be raised at the point of call to "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "Polkit_Unix_User_New"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", and everything would end up the same as in the first approach."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "break"
+            },
+            {
+              "emphasis": "bold",
+              "segment": "What could have been"
+            }
+          ]
+        },
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "As we saw, if polkit was written in Ada, our magic user would have inevitably triggered a Constraint_Error exception. If polkit used "
+            },
+            {
+              "emphasis": "none",
+              "segment": "SPARK Ada",
+              "link": "https://en.wikipedia.org/wiki/SPARK_(programming_language)"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", the tools would have attempted (and failed) to actually prove that uid would never be outside the range of gint at this point (either with a type conversion, or between two subtypes of the same type). In either case, "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "Polkit_Unix_User_New"
+            },
+            {
+              "emphasis": "none",
+              "segment": " would never execute with a value that was different than the value passed to it, and would almost certainly result in the authentication simply failing for the magic user (that would be the rational response to an unhandled exception flying out of the authorization process). Better yet, if using SPARK, the issue would have been discovered "
+            },
+            {
+              "emphasis": "italic",
+              "segment": "during development"
+            },
+            {
+              "emphasis": "none",
+              "segment": "!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "block": [
+        {
+          "indent": 0,
+          "line": [
+            {
+              "emphasis": "none",
+              "segment": "Unfortunately, polkit was not written in Ada, and there is a lot more to say about this story. If we reflect on the original patch, we recall the author lamenting about not being able to make a more proper change out of fear of \"breaking the API\". Ada has something to say about this situation as well. In part two, we'll focus on how Ada, as a language choice, could have done a much better a job at implementing polkit in the first place. Perhaps more importantly, Ada's superiority in the realm of readability and encapsulation naturally leads to excellent long-term maintainability and stability. That last point is especially relevant to open source software."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
