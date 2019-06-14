@@ -3064,7 +3064,7 @@
             },
             {
               "emphasis": "none",
-              "segment": " They require a very inconvenient and conspicuous instantiation of a generic function \"Ada.Unchecked_Conversion\", and are indented for very specialised, rare, low-level operations. Ada does this because type-casts are incredibly dangerous, and should only ever be used where their behavior (bit-for-bit copying) is specifically need - which is very rare. By taking this approach, Ada also makes it easy to find any such instances of Unchecked_Conversion, and audit their use.  Meanwhile in C, type-casts a way of life, and auditing their use is much less practical. They are also often responsible for causing very bad things. In this vulnerability, we even have a type-cast by default, which is extra bad."
+              "segment": " They require a very inconvenient and conspicuous instantiation of a generic function \"Ada.Unchecked_Conversion\", and are intended for very specialised, rare, low-level operations. Ada does this because type-casts are incredibly dangerous, and should only ever be used where their behavior (bit-for-bit copying) is specifically need - which is very rare. By taking this approach, Ada also makes it easy to find any such instances of Unchecked_Conversion, and audit their use.  Meanwhile in C, type-casts a way of life, and auditing their use is much less practical. They are also often responsible for causing very bad things. In this vulnerability, we even have a type-cast by default, which is extra bad."
             }
           ]
         }

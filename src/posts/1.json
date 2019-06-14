@@ -31,7 +31,7 @@
           "line": [
             {
               "emphasis": "none",
-              "segment": "A common criticism of Ada includes a perceived excess verbosity. In fact, that was a deliberate design decision. Often in our rush to insert more and more programmer convinces into our favourite languages, we tend to miss the raw human weaknesses that turn those shortcuts into unrelenting hazards."
+              "segment": "A common criticism of Ada includes a perceived excess verbosity. In fact, that was a deliberate design decision. Often in our rush to insert more and more programmer conveniences into our favourite languages, we tend to miss the raw human weaknesses that turn those shortcuts into unrelenting hazards."
             }
           ]
         }
