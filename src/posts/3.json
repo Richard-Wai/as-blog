@@ -1,0 +1,2657 @@
+{
+    "content": [
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "In "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "part one",
+                            "link": "https://annexi-strayline.com/blog/posts/2"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " we discussed how Ada as a language choice likely would have prevented the vulnerability on a purely technical basis. This second part focuses on the higher-level, and often overlooked benefits of Ada throughout the entire software lifecycle. We're going to explore not only how Ada would have made polkit safer, but more crucially, how Ada would have made polkit (or any large open-source project) easier to develop and maintain."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "The benefits of selecting Ada go far beyond avoiding bugs and improving safety and security. The enhanced reliability and security of Ada is largely the result of deliberate design, with help from the general weaknesses of popular languages (especially C et-al.)  The rarely discussed, but unparalleled structural discipline of Ada is at least as valuable as its strong type system and language rules. That structural discipline, which has always been a core design feature of Ada, is both unique and essential to Ada's aptitude for readability, maintainability, agility, and dramatically shortened testing phases. These are all the things that should be among the top concerns of any software project, and especially open-source projects."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "A key take-away from the polkit vulnerability is the difficulty in correcting the underlying cause of the flaw directly. Instead, due to the complexity and interdependencies of the codebase, changes needed to be localized and scope-limited \"band-aids\" - essentially new defensive coding. Although this vulnerability would likely have not arisen if polkit was implemented in Ada in the first place, we will still see how Ada nevertheless facilitates changes to the codebase without \"breaking the API\"."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Abstraction by design"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "The polkit codebase is a painful exhibit in \"write-only code\", which is probably the default condition for most software. The polkit codebase is largely devoid of helpful comments, and has chosen to make use an extremely awkward bolt-on object oriented type system for C via glib, instead of choosing an actual object-oriented language like Ada (ideal), or C++ (slightly better than glib). It is a bit perplexing that so much time would be spent developing a library to implement an entire multiple-inheritance, dispatching, object-oriented type subsystem for C, when using C++ could not possibly have been more difficult (and that says a lot). When software is difficult and frustrating to understand, it naturally follows that maintenance will be avoided whenever possible. It is human nature to avoid discomfort - such as maintaining write-only code."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "In the previous post, we commented that Ada was originally designed with an emphasis on readability in priority to ease of writing. But Ada doesn't stop there, and in this post we're going to highlight a few more subtle design priorities of Ada that are particularly relevant to vulnerabilities like the one polkit experienced."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Distributed development - the open source reality"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "image",
+            "src": "/blog_assets/3/arm_design_snippet.png",
+            "alt": "Ada 2012 Reference Manual - Pg xii, Design Goals, paragraph 9"
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Ada was "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "designed",
+                            "link": "http://ada-auth.org/standards/rm12_w_tc1/html/RM-0-3.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " from the outset to not just provide for, but to firmly encourage maximal encapsulation and habitual information hiding. The Ada package system encourages the partitioning of large programs into separate hierarchical subsystems and components, with interfaces protected by a strong set of language rules. Ada's package-subprogram-block progression is highly orthogonal, and using it correctly is easy to learn, easy to review, and above all else, regular. When done correctly, this abstraction methodology allows for the clear separation of a feature or subsystem interface from its implementation."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Getting it right the first time"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "While considering how the broader polkit would be structured if written in Ada is an interesting thought experiment, that is probably not a reasonable scope for a single blog post. Instead, we'll focus on the most problematic components of polkit that were at the core of the vulnerability: the PolkitIdentity \"class\". The role of PolkitIdentity is discussed in some detail in the first part, but in brief it represents the identity of an entity that needs to be authenticated. Typically this identity is a user id."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Abstracting the concept of an identity into an extendable object oriented interface is good concept. Unfortunately, due to the awkward use of glib on top of C, Polkit's design was a proverbial road to hell paved with good intentions."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "We will try to follow the original intention of the PolkitIdentity interface as closely as possible, while taking the necessarily liberties required to stay true to the \"Ada approach\". The PolkitIdentity interface at the time the vulnerability was discovered is defined "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "here.",
+                            "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkit/polkitidentity.h"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Though entirely optional to the programmer (unlike many other OOP languages), Ada has a complete set of object-oriented programming features. In fact, Ada was "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "the first",
+                            "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkit/polkitidentity.h"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " internationally standardized object-oriented language, ever.   Ada implements OOP features through a rich, polymorphic \"tagged\" type system. That system is well defined and highly orthogonal. Using tagged types, we do-away with awkward hacks like glib, and achieve the same functionality with greater safety, readability, maintainability, and "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "flexibility."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "The Ada rendition of the PolkitIdentity interface might look like this:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "with"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit.Hashing;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "package"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit.Identities "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "with"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Pure "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Identity_Parse_Failure: "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "exception;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "-- Raised by Polkit_Identity.From_String if the input string does not"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "-- identify a valid identity"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "---------------------"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "-- Polkit_Identity --"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "---------------------"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "type"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit_Identity "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is interface"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ";"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "function"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Hash (Identity: Polkit_Identity) "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit.Hashing.Hash_Type"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "  is abstract"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ";"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "function"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " To_String (Identity: Polkit_Identity) "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " String "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is abstract"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ";"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "function"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " From_String (S: String) "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit_Identity "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is abstract"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ";"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "-- Raises Identity_Parse_Failure if the input string does not encode an"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "-- identity"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "-- polkit_identity_get_type is not needed since Ada's tag system handles the"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "-- needs of that method"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "end"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit.Identities;"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Using the native OOP features of Ada, we can immediately rid ourselves of type-related macros, such as \"POLKIT_IS_IDENTITY\" , since the entire object-orientation driven awkwardly by glib is native to Ada's strong type system."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Ada provides all the facilities that these macros already provided. As an example, POLKIT_IS_IDENTY can be replaced by the far more elegant and readable membership test:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "It's interesting to note that Ada does not support preprocessor macros - and very deliberately. It should be no secret that such macros are dangerous and difficult to maintain. Instead, Ada relies on a more sane definition of constants, together with static expressions, to allow the compiler to easily optimize-out conditions that are statically evaluable at compile-time. To be brief, instead of #define and #ifdef, you can just use regular constants and regular conditional statements "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "to the same effect."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "if"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Some_Identity "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "in"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit_Unix_User "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "then"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "..."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Modus Operandi"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Ada has a notion of \"primitive operations\", which are essentially the procedures or functions that have parameters of, or which return values of a type that is declared in the same declarative region of the type. In short, primitive operations are procedures or functions that are implicitly associated with a type."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Ada tagged types extend the basic type system and implement the typical object-oriented semantics such as polymorphism and dynamic dispatching. In Ada, what many OOP languages refer to as \"methods\", are implemented as a special kind of primitive operation known as a \"dispatching operation\". Primitive  operations of tagged types are directly associated with the type through the type's \"tag\", and thus can be invoked through the familiar dot notation on any object of the class of a tagged type. "
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "In Ada, all primitive operations of an interface type that are not class-wide operations must be abstract. Abstract means that any extension of Polkit_Identity, either through direct or multiple-inheritance, must provide concrete operations for each of the abstract operations inherited. Since it is illegal to declare objects of an interface type, and since it is illegal to extend a type with abstract operations without providing concrete operations, the Ada language (i.e. the compiler) ensures that any object of the class (i.e. Polkit_Identity'Class) will always have all operations (the interface) of Polkit_Identity."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Note the inclusion of Hash in the interface. This is gives some flexibility to how any given member of Polkit_Identity'Class produces a hash value, but still ensures that they all provide a hash value of the same hash type. However if we wanted to standardize a hash method, say on the value of To_String, then  we can make the Hash operation \"class-wide\" thusly:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "function"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Hash (Identity: Polkit_Identity'Class) "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit.Hashing.Hash_Type;"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "This would then be a concrete, class-wide operation that would be applicable to all decedents of Polkit_Identity, and could not be overridden by any of them, thus allowing the enforcement of a standard hashing procedure, if needed. Even though interfaces are abstract types, we can still provide concrete operations if they are class-wide."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Note that we can make such a change easily at a later time. Going from an inherited to a class-wide operation, the Ada compiler will identify for us every override that needs to remove, since overriding class-wide operations is not permitted. Going the other way, the Ada compiler will also tell us where we are missing the required overriding operations for types implementing the interface."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Since we don't need to awkwardly hand-implement an extremely unsafe pseudo type system as was done with glib, we were able to cut out a lot of fat. Namely the "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "very ugly macros",
+                            "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkit/polkitidentity.h#L35"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " and "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "identification methods",
+                            "link": "https://github.com/freedesktop/polkit/blob/8c1bc8ab182f33a55503d30aa7a4ee96f822d903/src/polkit/polkitidentity.h#L72"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ". In their place we can use the Ada membership test facilities, or rely on automatic dispatching:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "#define POLKIT_TYPE_IDENTITY         (polkit_identity_get_type())"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "#define POLKIT_IDENTITY(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), POLKIT_TYPE_IDENTITY, PolkitIdentity))"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "#define POLKIT_IS_IDENTITY(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), POLKIT_TYPE_IDENTITY))"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "#define POLKIT_IDENTITY_GET_IFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE((o), POLKIT_TYPE_IDENTITY, PolkitIdentityIface))"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Now that we have identified a basic Polkit_Identity interface, we can consider how the PolkitUnixUser type (Polkit_Unix_User in the Ada naming convention) might then look in Ada. The typical design pattern in Ada would be to define what is colloquially known as a \"type package\", used to define one specific type, and its operations in a way that allows for the maximum level of encapsulation and abstraction. Indeed, Polkit.Identities is itself a type package. Polkit_Unix_User is naturally a child package of Polkit.Identities, being an extension of the Polkit_Identity tagged type."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "A key feature of Ada is that we can write the public specification of this package (the interface) without first needing to decide how we will implement it. When we start to design a package, we can focus on the purpose and use first. This means two things: for initial development, it means that users of the package can start working on their own parts without needing to wait for completion of the actual implementation of Polkit_Unix_User - as long as the specification compiles, it can be used. Secondly, if we ever need to change the implementation of Polkit_Unix_User, so long as we don't change the public part of the spec, we are "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "guaranteed"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " that we won't break things elsewhere in the program. That would have been a very helpful property to have when addressing the original polkit vulnerability."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Below is a sketch of the public interface for our new Polkit_Unix_User type:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "package"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit.Identities.Unix_User "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "type"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit_Unix_User "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is new"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit_Identity "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "with private"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ";"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "overriding"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "fundtion"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Hash (Identity: Polkit_Unix_User) "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit.Hashing.Hash_Type;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "overriding"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "fundtion"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " To_String (Identity: Polkit_Unix_User) "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " String;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "overriding"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "fundtion"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " From_String (S: String) "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit_Unix_User;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "-- To be continued ..."
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "end"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Polkit.Identities.Unix_User;"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "By implementing the Polkit_Identity interface, we have made it a member of Polkit_Identity'Class. Predefined equality also exists, since it is a non-limited type. Users of Polkit_Unix_User can now compare it with other Polkit_Unix_User objects, and and fit it into the larger Polkit_Identity framework. The next step is to complete the type (in the private part). By defining a private type and completing it in the private part, users of Polkit_Unit_User, beside child units, cannot rely on any specific representation (such as bit width, or signed/unsigned). That also means we can change it in the future without needing to worry about breaking anything."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Note the overriding keyword. By specifying overriding (or \"not overriding\"), the compiler will ensure that we are truly overriding something. This is more useful than it may appear. By explicitly specifying our intention, we can catch simple spelling mistakes which could be otherwise hard to spot, and if the interface we are deriving from ever changes, the compiler will tell us about that too. Similarly using \"not overriding\" on subprograms which are intended to be new operations of the type ensures that the progenitor types won't slip in operations of the same name at a later that would get silently overriden."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "When thinking about how we could represent a UNIX user Polkit_Identity, we need to consider what information is critical to the identification of a \"UNIX user\". At a minimum, we'd probably need a UNIX user identification value (uid), and likely a group identification value (gid)."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "So far sounds like we're headed towards a record type, but we still need to decide the types for the uid and gid components of that records type. To do that, we should first consider if uids and gids are something that will get used elsewhere, either inside or outside our package. If we decide we want to expose those types, it might be better to define those types in another package that is more global or general. It may be tempting to define these types directly inside Polkit.Identities.Unix_User, and is often how we'd start when prototyping. Not only is this the \"easiest\" approach, it also makes sense if we want to treat Polkit_Unix_User Identities abstractly. However, if we consider the larger polkit context, we can find a strong argument for defining a separate package for all UNIX-specific features. The reasoning for this is two-fold. First, this approach is simply good software engineering practice, and is a really good habit to ingrain. The second reason is more specific to polkit itself. Let's be honest: polkit runs on unix-like systems almost exclusively. Windows already has its own framework that does the same thing, and multi-user authentication is not something we typically find a need on, say, an RTOS. This bias shows, as the out-of-the-box authentication agent for polkit is already specific to \"PolkitUnixUser\". But more still, polkit provides many unix-specific operations for identifying \"unix groups\", \"unix sessions\", \"unix processes\", and even \"unix net groups\". It is therefore foreseeable that polkit will have a good deal of disparate but unix-centric code. That tells us that we probably need somewhere to put all the things specific to interactions with the unix environment. If (when) the surrounding unix environment changes, it is no mystery where we need to make changes, and making those changes to a centralized package means the changes will safely propagate throughout the codebase."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Privacy laws"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Here's what that UNIX package might look like:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "package"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " UNIX "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "type"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " uid "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is private"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ";"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "function"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Is_Root (ID: uid)      "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Boolean;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "function"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Name    (ID: uid)      "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " String;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "function"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Resolve (Name: String) "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " uid;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "type"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " gid "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is private"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ";"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "function"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Name    (ID: gid)      "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " String;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "function"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Resolve (Name: String) "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " gid;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "private"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "type"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " uid "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " ...;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "type"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " gid "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " ...;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "end"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " UNIX;"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "By using private types, we can hide the actual representation from users of the type. We can also control the usage of the type by defining the operations of the type. For most purposes, including polkit's, we really only need a few facilities:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "list",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Compare uids for equivalence"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Identify a root uid"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Convert uids to and from the \"human readable\" user name associated with a particular uid."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Of course, we can always add more operations later!"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "By making uid and gid private types, the Ada language rules will make it impossible for any non-child user of this package to rely on the actual value or representation of uid or gid (or even the actual value of root). It also makes it impossible for user of the package to use the uid/gid types in unexpected ways. This is something that happens frequently in large projects. If we oddly made uid a signed type, find out it causes a "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "severe vulnerability"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ", and then want to change it to unsigned, we might find that parts of the program are deliberately relying on the possibility of negative values. By fixing the representation, we break things in unexpected places, and the way we break things is often difficult to fix. If a programmer is taking advantage of -1 to represent some kind of condition, removing -1 requires significant refactoring. The Ada type system allows the programmer to strictly control both the behavior "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "and the usage"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " of types throughout the program. By making this type private, users of the package are simply not allowed to rely on any properties of the underlying representation."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Private types are probably the single most important feature of the Ada type system, and are crucial for the safety and maintainability of large programs. If the underlying representation of a uid changes (that has happened before), or even if we get it wrong (such as polkit did), we are guaranteed the freedom to change the representation without breaking code anywhere else in the larger program. The polkit vulnerability is a shining example of how valuable that is, and is probably the second most important argument for why polkit should have used Ada."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Data modeling vs. representation"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Moving on  to the private part of the UNIX package, we have to decide how exactly we intend to define the uid and gid types. In almost all other languages, all types are machine types. So it may be natural in almost any other language to (simplistically) view a \"uid\" as some X-bit unsigned number (signed if you're polkit). Ada has a different, more rich approach to types. The Ada type system is about modeling data, not representing data. Representation is an issue for the compiler; Ada programmers should think about what the data means, not what it looks like in memory. When using a uid for authentication or identification, the actual numeric value isn't necessarily meaningful. That is to say, the fact that user_a has an id larger than user_b is of no practical significance. A uid is simply a unique identifier of a particular user within a particular instance of unix. We can associate a name with a uid, we can associate uids with groups (gids), and we can identify a the universally predefined superuser (root)."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Moving on to consider the gid type, we find a perfect example of the understated power of the data modeling concept. A gid value often has the same representatioon as uid, but the value itself has no direct relationship with uid values; there is never a case where we would want to add a uid to a gid, or to assign a uid value to a gid variable. "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "This is how we know they should be separate types."
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " As a rule of thumb, we use separate types in Ada whenever two values have no "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "conceptual"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " relationship to each other. It does not matter if they share the exact same machine representation - because in Ada, it is not about the representation of the value, it is about the meaning of the value. The distinction between Ada's data modeling type system and other \"strong typing\" systems is often understated, but is fundamental to the innate safety qualities of Ada."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "If we come from the traditional programming model of machine types for everything, we might immediately jump to \"signed or unsigned\" and then \"how many bits\". Uid's shouldn't be negative, so therefore it should be unsigned. We might \"know\" that the OS (for now) represents it as a 32-bit unsigned integer. So it might be natural for the non-Ada programmer to complete the uid (and gid) types as an unsigned 32-bit number. And indeed this is very possible in Ada - it is a modular type. The definition would look as follows:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "type"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " uid "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is mod"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " 2**32;  -- An unsigned 32-bit value."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "But there is a problem. Unsigned values in general, including Ada modular types, have the overflow behaviour of wrapping-around. If we add 1 to a uid of 4,294,967,295, we'll end up with a result of 0 (root). And it does not matter how this might happen - there are exactly no circumstances where that makes sense, so it simply should not ever be allowed. If we wanted to prevent this in C, we'd have to manually check for overflow conditions every time we operated on a uid type - something humans are very unreliable at. In Ada, we simply model the type with a contract that explicitly restricts the range. It looks like this:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "type"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " uid "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is range"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " 0 .. 2**32 - 1;"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Now if we ever had an operation that would conceptually overflow the largest uid (in Ada we can refer to uid'Last), we will end up with a Constraint_Error exception, rather than an incorrect value. The Ada compiler will automatically insert run-time checks to ensure that any value assigned to an object of type uid is always within the explicit range of uid."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Now you might ask yourself: \"what if I need to get a uid value from somewhere else?\" As in, what if we want to source a uid from an external library, or other external source. The right answer would be to craft a child package for that purpose. We know from our "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "analysis",
+                            "link": "https://annexi-strayline.com/blog/posts/2"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " that we need to query D-Bus for the uid of the caller, and we know that the D-bus spec "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "mandates such a service",
+                            "link": "https://dbus.freedesktop.org/doc/dbus-specification.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ". Knowing that, it is safe to assume that we will have a generalized D-bus package which handles D-bus method calls, and defines standard D-bus types. In this case, we know that we'll be dealing with the \"org.freedesktop.DBus.GetConnectionUnixUser\" method, which returns a \"UINT32\" value. This is everything that we need to create a child package which doesn't need to expose the private types for uid or gid. It could look something like this:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "with"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " DBUS;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "package"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " UNIX.DBus_Credentials "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "function"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Get_Connection_UID (Connection: DBUS.DBus_Connection) "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " uid;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "-- .. etc"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "end"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " UNIX.DBus_Credentials;"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Then in the package body where we implement Get_Connection_UID, we will have full visibility of the uid type, and full access to the expected result of the D-bus method call, which we can then safely assign with a type "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "conversion."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "package body"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " UNIX.DBus_Credentials "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "function"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Get_Connection_UID (Connection: DBUS.DBus_Connection) "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " uid"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "is"
+                        }
+                    ]
+                },
+                {
+                    "indent": 2,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Dbus_uid: DBUS.UINT32;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "begin"
+                        }
+                    ]
+                },
+                {
+                    "indent": 2,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "DBUS.Connection_Call (Connection     => Connection,"
+                        }
+                    ]
+                },
+                {
+                    "indent": 2,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "                      Name           => \"org.freedesktop.DBus\","
+                        }
+                    ]
+                },
+                {
+                    "indent": 2,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "                      Path           => \"/org/freedesktop/DBus\","
+                        }
+                    ]
+                },
+                {
+                    "indent": 2,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "                      Interface_Name => \"org.freedesktop.DBus\","
+                        }
+                    ]
+                },
+                {
+                    "indent": 2,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "                      Method         => \"GetConnectionUnixUser\","
+                        }
+                    ]
+                },
+                {
+                    "indent": 2,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "                      Payload        => Dbus_uid);"
+                        }
+                    ]
+                },
+                {
+                    "indent": 2,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 2,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "return"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " uid (Dbus_uid);  -- Ada type conversion"
+                        }
+                    ]
+                },
+                {
+                    "indent": 2,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "end"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Get_Connection_UID;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "end"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " UNIX.DBus_Credentials;"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Apples to apples"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Note how Get_Connection_UID returns a type conversion of dbus_uid (a DBUS.UINT32) to uid (mod 2**32 - I .e unsigned 32). This is totally unlike a C type-cast. An Ada type conversion has a large set of "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "strict rules",
+                            "link": "http://ada-auth.org/standards/rm12_w_tc1/html/RM-4-6.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ", but the gist is that the value of the source object "
+                        },
+                        {
+                            "emphasis": "underline",
+                            "segment": "must"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " be a sane value of for the target object. For scalar values, that means that the source object's "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "actual number value"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " must be in the range of the target type or subtype."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Lets look at a quick example of what exactly this means. In C, we could do this (assuming 16-bit int):"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "unsigned"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " A = 0xFFFF;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "int"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " B = ("
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "int"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ")A;"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "B would of course be -1, since 0xFFFF as a signed 16-bit value is -1, and the type-cast simply places the 16-bits of binary from A into B."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "In Ada, we get something much more rational:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "with"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Interfaces.C; "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "use"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " Interfaces.C;  -- defines C-equivalent \"unsigned\" and \"int\""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "declare"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "A: unsigned := 16#FFFF#;  -- Ada syntax for 0xFFFF"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "B: int      := int(A);    -- Type conversion of A into int"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "begin"
+                        }
+                    ]
+                },
+                {
+                    "indent": 1,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "null;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "end;"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "This would give us a Constraint Error at run-time! In fact, any decent compiler will find this problem at compile-time. That is because in Ada, the value which is supposed to go into B is seen as the value of A, which is, unequivocally 65,535. Since the int type is a signed 16-bit value, it has a range of -32,768 to 32,767. 65,535 is not a valid value of an object of the int type. The compiler inserts a run-time check as part of the type conversion to ensure that the "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "actual"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " value of A will be in the range of int. In other words, Ada requires a check that the "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "actual"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " value of A is a valid "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "actual"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " value of B, regardless of the representation in memory."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Going back to our implementation of Get_Connection_UID, the Ada compiler inserts a run-time check at the type conversion to ensure the value we got off of D-bus will always be valid for the uid type. If D-bus was using a 32-bit unsigned (as it does), and our uid was \"signed\" (in Ada terms, the type range included negative numbers), we could potentially have a Contraint_Error with the magic user, since the UINT32 value coming in could be simply "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "out of range"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " of the uid type. You can be pretty confident that such an exception would not, however, cause the user to be identified as root. This is a key concept in Ada - "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "only"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " zero means zero. You simply cannot assign a value that is not valid for a type to that type. This is true also for assignments between subtypes of the same type. Though such assignments do not need an explicit type conversion, the compiler still inserts a check. If polkit was implemented in Ada, we would be technically fine to continue to use a \"signed\" 32-bit value for uid, with the only risk being a run-time exception.  Instead of polkit_system_bus_name_get_user_sync returning literally the identity for root, we would get a Constraint_Error exception. At very worst, if no handlers existed within the entire backend authority, polkitd would terminate (which systemd would then attempt to restart), but systemctl would never be authenticated - a much safer outcome."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Maintenance"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Behind the constant waterfall of vulnerabilities lies systemic issue: the issue of poor maintainability. When new vulnerabilities appear, patches needs to be made. When the environment in which software runs changes, patches  need to be made. The problem is that these patches far too often spawn even more vulnerabilities and instabilities, leading to more patches. How much productivity is lost to this never-ending process of fixing things one place only to break things somewhere else? The software community would do well to scrutinize this reality a little more. Does software maintenance really need to so this sloppy, and increasingly difficult? Far from being \"iterative\", this process leads to stagnation, especially among open-source projects. When making changes becomes increasingly difficult and dangerous, there will naturally arise aversion to change."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "The original patch to the polkit vulnerability contained a note admitting that the \"nicer fix\" to the problem was untenable because it would \"break the API\". That nicer fix was simply about changing the underlying type. What if we needed to change the underlying representation of a type (Polkit_Unit_User) in our Ada implementation? We already made the right decision to force uid values to be unsigned values, so we've already obliterated the vulnerability. But who knows? Maybe one day Linux will migrate to 64-bit uids. If that happens, polkit will be in real trouble. But if polkit was written in Ada, we can be highly confident that it won't be a big deal. The strong structural discipline inherent in Ada gives us great confidence that any change is possible; that the effects are predictable, and containable. This makes planning a change and predicting the required effort easier, and greatly simplifies testing. In other words: "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "software written in Ada can be far more agile."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "In the case of polkit, we'd probably start with thee UNIX package - where the uid type is defined, and make a simple change to the private type uid (and likely gid):"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "type"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " uid "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is range"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " 0 .. 2**32 - 1;"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Becomes"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "code",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "type"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " uid "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "is range"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " 0 .. 2**64 - 1;"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Now we could spend some time to review the child package of the UNIX package, to make sure that this change won't impact the private parts of any children. Even if we don't, we can be 100% sure that there will be no impact (need for patching) outside of the UNIX package, because we know that no users of that type are allowed to know what changed, or that anything changed at all! "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "There is no way that it can \"break the API\"."
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " This is a common reality with standard Ada design patterns. Private types abound, and their properties are localized and abstracted to a package or subsystem - in Ada, APIs include types and not just operations."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "But lets say we didn't review the child packages - the worst case scenario. What then happens to the DBus_Credentials package? Well, there are a few possible outcomes depending on the context."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "One possibility is that the Dbus package we are relying on, which is supposed to return a \"UINT32\" on the call has not been updated to reflect the hypothetical new uid size. In that case, we will receive a UINT32, which gets type-converted into our new uid. The Ada compiler is able to determine that there is no possible value in DBUS.UNIT32 which is outside of our uid type, and so is able to discard any runtime check here. This outcome is totally benign."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Another possibility is that the Dbus package also has been updated to use UNIT64 instead of a UNIT32 for the GetConnectionUnixUser call. Since the Dbus package is likely relying on overrides for the various Connection_Call parameter configurations, it will need to decide how to deal with a call to GetConnectionUnixUser with a UNIT32 parameter. If the d-bus specification has been updated to use UINT64 for users, we'd naturally expect the d-bus interface to complain about an incorrect parameter type, likely through an exception. What won't happen is any possibility that we will be getting an erroneous value for uid, and its far more unlikely that we'd be getting the appearance of normal execution. Polkit would still be safe, the issue would still be contained to the UNIX package."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "In both scenarios, what wouldn't happen would be a sudden explosion of errors throughout the codebase during build, and a bunch more obscure conditions that would be triggered at random during use. We get all of that and we don't need band-aids."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "A language that finds bugs at run-time is a great asset, but it is not the only strength of Ada. One of the most undersold features of Ada is its structural design geared towards long-term flexibility, maintainability, and managing complexity. Ada is designed to allow software to be changed safely, reliably, and continuously. It is designed to encourage habitual abstraction and information hiding. It is a language designed on the principles of good software "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "engineering."
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

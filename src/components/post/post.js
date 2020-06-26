@@ -7,7 +7,7 @@ import ListItem from '../list_page/list_item/list_item'
 
 import './post.scss'
 
-const elaborateBlock = (c) => (
+const elaborateBlock = (c, isList) => (
   c.map((l, index) => {
     const line = l.line.map((seg, index) => {
       var segment_actual;
@@ -56,7 +56,8 @@ const elaborateBlock = (c) => (
 
     })
 
-    return (<div key={index} className={`tab-${l.indent}`}>{line}</div>)
+    return isList ? <li key={index} className={`tab-${l.indent}`}>{line}</li>
+      : <div key={index} className={`tab-${l.indent}`}>{line}</div>
 
   })
 )
@@ -65,13 +66,16 @@ const elaborateParagraph = (p) => {
 
   switch (p.type) {
     case "text":
-      return (<div className="post_paragraph">{elaborateBlock(p.block)}</div>)
+      return (<div className="post_paragraph">{elaborateBlock(p.block, false)}</div>)
+
+    case "list":
+      return (<ul className="list_block">{elaborateBlock(p.block, true)}</ul>)
 
     case "quote":
-      return (<div className="quote_block">{elaborateBlock(p.block)}</div>)
+      return (<div className="quote_block">{elaborateBlock(p.block, false)}</div>)
 
     case "code":
-      return (<div className="code_block">{elaborateBlock(p.block)}</div>)
+      return (<div className="code_block">{elaborateBlock(p.block, false)}</div>)
 
     case "image":
       return (<img src={p.src} alt={p.alt} />)

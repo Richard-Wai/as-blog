@@ -43,6 +43,21 @@
       ],
       "sequence": 2,
       "image": "https://annexi-strayline.com/blog_assets/2/polkit_arch.png"
+    },
+    {
+      "title": "Should Have Used Ada (SHUA) #2 - Polkit gets \"confused\"",
+      "subtitle": "(Part 2)",
+      "author": "Richard Wai",
+      "abstract": "The rarely discussed, but unparalleled structural discipline of Ada is at least as valuable as its strong type-system and language rules. That structural discipline, which has always been a core design feature of Ada, is both unique and essential to Ada's aptitude for readability, maintainability, agility, and dramatically reduced testing requirements.",
+      "topics": [
+        "SHUA",
+        "Ada",
+        "polkit",
+        "Maintainance",
+        "Agile"
+      ],
+      "sequence": 3,
+      "image": "https://annexi-strayline.com/blog_assets/3/polkit_ada_snippet.png"
     }
   ]
 }

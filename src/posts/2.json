@@ -3529,7 +3529,16 @@
           "line": [
             {
               "emphasis": "none",
-              "segment": "Unfortunately, polkit was not written in Ada, and there is a lot more to say about this story. If we reflect on the original patch, we recall the author lamenting about not being able to make a more proper change out of fear of \"breaking the API\". Ada has something to say about this situation as well. In part two, we'll focus on how Ada, as a language choice, could have done a much better a job at implementing polkit in the first place. Perhaps more importantly, Ada's superiority in the realm of readability and encapsulation naturally leads to excellent long-term maintainability and stability. That last point is especially relevant to open source software."
+              "segment": "Unfortunately, polkit was not written in Ada, and there is a lot more to say about this story. If we reflect on the original patch, we recall the author lamenting about not being able to make a more proper change out of fear of \"breaking the API\". Ada has something to say about this situation as well. In "
+            },
+            {
+              "emphasis": "none",
+              "segment": "part two",
+              "link": "https://annexi-strayline.com/blog/posts/3"
+            },
+            {
+              "emphasis": "none",
+              "segment": ", we'll focus on how Ada, as a language choice, could have done a much better a job at implementing polkit in the first place. Perhaps more importantly, Ada's superiority in the realm of readability and encapsulation naturally leads to excellent long-term maintainability and stability. That last point is especially relevant to open source software."
             }
           ]
         }
