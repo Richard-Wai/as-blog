@@ -1,6 +1,7 @@
 import React from 'react'
 import './list_item.scss'
 
+/* eslint-disable */
 
 export default (props) => {
 

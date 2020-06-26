@@ -1,7 +1,7 @@
 import React from 'react'
 import { TwitterShareButton, FacebookShareButton, LinkedinShareButton } from 'react-share'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTwitterSquare, faFacebook, faLinkedin } from '@fortawesome/free-brands-svg-icons'
+import { faTwitterSquare, faFacebookSquare, faLinkedin } from '@fortawesome/free-brands-svg-icons'
 import Layout from '../layout/layout'
 import ListItem from '../list_page/list_item/list_item'
 
@@ -114,7 +114,7 @@ const Post = (props) => {
             <FontAwesomeIcon icon={faTwitterSquare} />
           </TwitterShareButton>
           <FacebookShareButton className="social_sharing_button" url={props.location.href} quote={props.pageContext.header.title} via='annexi.strayline'>
-            <FontAwesomeIcon icon={faFacebook} />
+            <FontAwesomeIcon icon={faFacebookSquare} />
           </FacebookShareButton>
           <LinkedinShareButton className="social_sharing_button" url={props.location.href} description={props.pageContext.header.title}>
             <FontAwesomeIcon icon={faLinkedin} />
