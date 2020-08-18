@@ -21,7 +21,7 @@ small {
   line-height: 1.5em;
   text-align: left;
   background-color: rgba(0,0,0,0.5);
-  margin: 0;
+  margin: auto;
   padding: 1em 2em 2em 2em; 
 
   .highlighted_text {
@@ -33,10 +33,11 @@ small {
     padding-right: 15%;
   }
 
-  @include media-breakpoint-down(sm) {
+  @include media-breakpoint-down(md) {
+    margin: 0;
     line-height: 1.3em;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding-left: 2%;
+    padding-right: 5%;
   }
 
 }
@@ -52,6 +53,7 @@ small {
   padding: 1em;
   margin-left: 2em;
   margin-right: 4em;
+  margin: auto;
 
   white-space: pre-wrap;
 
@@ -60,8 +62,11 @@ small {
     background-color: rgb(134, 197, 255);
   }
 
-  @include media-breakpoint-down(sm) {
+  @include media-breakpoint-down(md) {
     margin: 0;
+  }
+
+  @include media-breakpoint-down(sm) {
     font-size: 0.5em;
   }
 

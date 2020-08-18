@@ -1809,7 +1809,19 @@
                         },
                         {
                             "emphasis": "none",
-                            "segment": ". Knowing that, it is safe to assume that we will have a generalized D-bus package which handles D-bus method calls, and defines standard D-bus types. In this case, we know that we'll be dealing with the \"org.freedesktop.DBus.GetConnectionUnixUser\" method, which returns a \"UINT32\" value. This is everything that we need to create a child package which doesn't need to expose the private types for uid or gid. It could look something like this:"
+                            "segment": ". Knowing that, it is safe to assume that we will have a generalized D-bus package which handles D-bus method calls, and defines standard D-bus types. In this case, we know that we'll be dealing with the \"org."
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "freedesktop."
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "DBus."
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "GetConnectionUnixUser\" method, which returns a \"UINT32\" value. This is everything that we need to create a child package which doesn't need to expose the private types for uid or gid. It could look something like this:"
                         }
                     ]
                 }

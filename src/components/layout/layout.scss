@@ -1,7 +1,19 @@
 @import "../../sass/style.scss";
 
 .container {
-  margin: auto !important;
+  margin: auto;
+  padding: 0 !important;
+
+  @include media-breakpoint-down(md) {
+    margin: 0 !important;
+  }
+
+}
+
+.post_content {
+  @include media-breakpoint-down(md) {
+  width: 100vw !important;
+  }
 }
 
 body {
@@ -11,6 +23,7 @@ body {
 #content_area {
   min-height: 90vh;
 }
+
 
 .navbar {
   padding: 0;
