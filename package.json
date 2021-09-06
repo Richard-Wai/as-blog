@@ -1,7 +1,6 @@
 {
-  "name": "gatsby-starter-hello-world",
-  "description": "Gatsby hello world starter",
-  "license": "MIT",
+  "name": "ANNEXI-STRAYLINE Blog",
+  "description": "A custom React+Gatsby blog system to generate a fully static webpage.",
   "scripts": {
     "develop": "gatsby develop",
     "build": "gatsby build",
