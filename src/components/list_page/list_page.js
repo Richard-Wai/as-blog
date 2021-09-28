@@ -126,7 +126,7 @@ class ListPage extends Component {
         </span>
       );
 
-    const postItems = finalPosts.map((post) => (
+    const postItems = finalPosts.reverse().map((post) => (
       <Link to={'/blog/posts/' + post.sequence} key={post.sequence}>
         <ListItem post={post}
           SelectTopic={topic => this.SelectTopic(topic)} />

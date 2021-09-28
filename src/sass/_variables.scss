@@ -13,6 +13,8 @@ $as-primary: rgba(51,102,153, 1);
 $as-primary-back: rgba(51,102,153, 0.5);
 
 $as-reading-text: rgb(226, 226, 219);
+$as-link-text: rgb(180,180,230);
+
 
 // Bootstrap Default Colors
 
@@ -179,7 +181,7 @@ $body-color: $gray-900 !default;
 //
 // Style anchor elements.
 
-$link-color: theme-color("primary") !default;
+$link-color: $as-link-text !default;
 $link-decoration: none !default;
 $link-hover-color: darken($link-color, 15%) !default;
 $link-hover-decoration: underline !default;

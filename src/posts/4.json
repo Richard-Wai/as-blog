@@ -1,0 +1,1127 @@
+{
+    "content": [
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "italic",
+                            "segment": "This post is a treatise on the design philosophy and effort behind the AURA project. For detailed documentation on the actual workings of AURA, and a description of the core concepts, check out the "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "official docs",
+                            "link": "https://aura-docs.readthedocs.io"
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "italic",
+                            "segment": "Our open source reference implementation (\"AURA CLI\") can be found "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "here",
+                            "link": "https://github.com/annexi-strayline/AURA"
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": ". "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "Build instructions",
+                            "link": "https://aura-docs.readthedocs.io/en/latest/quick_start/installation.html"
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": " are in the docs."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "italic",
+                            "segment": "Additionally, our public repository, "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "ASAP",
+                            "link": "https://github.com/annexi-strayline/ASAP"
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": " contains a collection of open source, BSD-licensed AURA subsystems we maintain. "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "Instructions",
+                            "link": "https://aura-docs.readthedocs.io/en/latest/quick_start/using_an_aura_package.html"
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": " on using this repository can also be found in the official docs."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "No Shirt, No Shoes, No Service."
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "There was a time, only a decade or two ago, when corporations large and small attempted to corner technologies not just through proprietary software, but through proprietary ecosystems. This meant proprietary APIs accessed through proprietary libraries, with software written in proprietary languages, built with proprietary compilers. Despite continued efforts by a few remaining heavyweights, it has become increasingly obvious that there is little success to be found in that approach. The reason for this shift should be pretty obvious by now: the rise and total dominance of open source software."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "The prevalence of open source software naturally spurred the adoption of open source languages. Such languages tend to exhibit four properties as an indicator to broad adoption:"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "numbered_list",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "They are general purpose;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "They are totally free to use for "
+                        },
+                        {
+                            "emphasis": "italic",
+                            "segment": "any"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " purpose;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "They have a low barrier to entry (tooling, compilers, etc.), and;"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "They have plentiful open source libraries and/or bindings for common activities."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Ada confidently satisfies the first three properties. It is explicitly designed to be general purpose, and is one of the few languages in its class to effortlessly span the spectrum from low-level embedded firmware to massively distributed applications of extreme complexity. Ada is also firmly in the public domain, with a freely available international standard. The most well-used and actively maintained Ada compiler is open-source, as a first-class member of GCC. Ada is extraordinarily easy to learn, especially given its size and capabilities. It is regular, disciplined, fully specified, orthogonal, and readable. But that alone doesn't give it a truly low barrier to entry. Writing the classic \"hello world\" in Ada on Ubuntu is as easy as it is for almost any other popular language, but that is not enough in the modern era of frameworks and APIs. Ada lacks the ease with which languages like Python, Javascript, Go, and Rust give \"batteries included\" access to expansive libraries and frameworks."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "In our opinion, the greatest barriers to increased adoption of Ada in mainstream software is the lack of foundational open source libraries that are easily accessible, together with the lack of an easy-to-use build environment. Ada needs to be better at helping new users get up and running quickly - similar to other languages with integrated package management and build tools such as Javascript/Node's 'npm', Rust's 'cargo', and Go's.. 'go'. "
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Towards a native, integrated, decentralized, package management solution for Ada."
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "For primarily these reasons, and spurred by our own urgent needs, in late 2019 we started to work on the concept of AURA - the Ada User Repository Annex. Our goal was simple, but specific: to build a native package manager and build system for Ada."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Native to us means two things. Firstly, it should appear as integrated as possible with the language. That means no TOML, YAML, INI or \"Ada-like\" configuration syntax (looking at you "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "gprbuild",
+                            "link": "https://docs.adacore.com/gprbuild-docs/html/gprbuild_ug.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "). We believe that all configuration should be done exclusively through Ada program text, and should be integrated into the project's codebase. Secondly, it should commit to reflecting the philosophical underpinning of the language, particularly by avoiding inappropriate \"me-too\" designs. Ada has a unique, popularly contrarian philosophy, and needs a unique approach that conforms to that philosophy."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "After a few years of effort and heavy testing, including significant time in internal production, we believe that we have arrived at a solution that meets our definition of a native package manager for Ada. And today we are excited to bring it to the community. While it remains in beta, and is still lacking some convenience features, we think it is stable and functional enough for most use cases."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "What about ALIRE?"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "It turns out, as is often the case, we weren’t the only ones getting this idea. And sometime shortly after we began working on AURA, another Ada package manager "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "ALIRE",
+                            "link": "https://alire.ada.dev/"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " appeared."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Let us be clear: "
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": "ALIRE is a great project, and you should check it out."
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " We hope everyone will evaluate it, and decide if it is right for their purposes. The people behind ALIRE have no doubt created something elegant and functional, and clearly successful."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "But let us also be frank. We quite strongly disagree with the approach ALIRE takes. We feel it is too \"me-too\", and not Ada-specific enough, borrowing too heavily from Rust's cargo. It doesn't, to us, feel like a truly Ada-native solution. Tangentially, the use of the word \"crates\" for the unit of management does little to evoke the kind of principled self-confidence Ada normally exudes."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "At the end of the day, we strongly believe in both competition and democracy. That is what makes open source so powerful. Our philosophical disagreement simply means more choice for the Ada community. It is a sign of vitality, and we're excited to be a part of it."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Package management as a Specialized Need Annex"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Besides the core language, the Ada standard contains a number of optional extensions that a compliant Ada compiler may support. These extensions are included in the Ada standard as "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "\"Specialized Needs Annexes\"",
+                            "link": "http://ada-auth.org/standards/rm12_w_tc1/html/RM-1-1-2.html#I1007"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ". If a compiler claims to implement an annex, it must comply with the requirements of that annex. "
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Since we wanted to build a package management solution that was as integrated as possible with Ada, pursuing a conceptual new Specialized Needs Annex for the purpose was a logical, if not alluring approach. Specifying package management as an SNA may be a bold - controversial even - but it is hard to argue against its value as a foundational design goal."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "As of yet we have not started any formal proposal to the ARG, and regardless if that ever happens, or if it ever succeeds, we aimed to constrict the design of AURA to be realistic behaviour for a new Specialized Needs Annex. We wanted an approach that did not require a specific stand-alone tool, and could instead be handled directly by the compiler itself. Indeed, the way in which AURA handles dependency resolution and (auto) configuration are areas where an Ada compiler would be especially well-equipped."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Package is a "
+                        },
+                        {
+                            "emphasis": "bold_strikethrough",
+                            "segment": "dirty"
+                        },
+                        {
+                            "emphasis": "bold",
+                            "segment": " reserved word"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Ada was explicitly designed from the very beginning to support modularity and code-reuse, with the "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "library unit",
+                            "link": "http://ada-auth.org/standards/rm12_w_tc1/html/RM-10-1-1.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " concept, the importance of "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "separate compilation",
+                            "link": "http://ada-auth.org/standards/rm12_w_tc1/html/RM-10-1.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ", and rich generics.  Ahead of it's time, Ada was among the first major languages truly designed for \"programming in the large\" - disciplined software engineering for the development of massive applications, built by multiple teams that might not regularly interact. Chief among Ada's disciplined structure is the venerable Ada package - a powerful construct that enabled the elegant private type, and champions the specification-body discipline. Due to its prominent position in Ada, and of course with such a fitting name, it might seem natural to use it as the unit of management for a \"native\" Ada package manager. However that idea quickly sours under scrutiny."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "The hierarchical organization of Ada packages imposes strong compile-time language rules between parent, children, and siblings. Managing individual packages of a larger hierarchy a is a well-demonstrated danger. \"Micro packages\", as they are sometimes known, make the interdependency problem of package management much more difficult than it already is, and at very little benefit - particularly in the context of Ada. Thankfully, Ada has a much more appropriate concept - the "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "subsystem",
+                            "link": "http://ada-auth.org/standards/rm12_w_tc1/html/RM-10-1.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ". An Ada subsystem is simply a library unit family tree rooted at a \"top-level\" package (a first child of Standard). It is much more advantageous to use this Ada-native subsystem concept as the unit of management. Indeed it is more natural for logically separate components of a program to be written as self-contained subsystems anyways. Even where some collection of very small useful but unrelated components may be desirable, there is no reason they cannot themselves be packaged into a larger subsystem.  Thus, AURA's unit of management is the AURA subsystem - which is simply an Ada subsystem that is obtained and "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "configured",
+                            "link": "https://aura-docs.readthedocs.io/en/latest/concepts/autoconfiguration.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " through AURA-specific means."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "With this design, introducing a dependency on an AURA subsystem is as simple as \"withing\" any library unit of that subsystem. AURA is really about specifying some special behavior that occurs whenever an Ada dependency cannot be immediately found in the "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "\"program library\"",
+                            "link": "http://ada-auth.org/standards/rm12_w_tc1/html/RM-10.html#I4314"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ". While a non-AURA compiler will simply reject the compilation, an AURA-compliant compiler will make an attempt to obtain the missing subsystem(s) through a configured AURA repository."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Hard opinions for hard decisions."
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Package management is a surprisingly hard problem. There are two aggravating realities driving this difficulty. The first is that there will invariably be packages that depend on other packages. The second is that packages eventually need to be updated. Where the problem becomes hard is when (not if) those two inevitabilities intersect. What happens when multiple packages individually depend on different versions the same package?"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Looking at most popular language package managers out there, such as npm, pip, cargo, and even ALIRE, we see a common strategy of enforcing a versioning scheme via the package manager itself, and by extension, some mechanism for specifying inter-dependency version requirements. In theory this allows for any given package or project to clearly state the (minimum) required version of packages that it depends on. In practice, this means such a package manager enforced versioning scheme dooms both package authors and end users to certain conflict at some point. Anyone familiar with Node will know this pain. To mitigate the situation, developers and users often resort to avoiding interdependencies, or resist updating dependencies. This can lead to an abundance of duplicated code, or dangerously out-of-date dependencies. Worse still is when newer versions of a package introduce breaking changes, which minimum version specification does little to help. This situation increasingly leads to either lingering security vulnerabilities, or breaking changes that propagate with hopeless breadth and consequence. It is dangerous cascading breakdowns like this that Ada was designed to avoid. The last thing we want to do is impose this situation through a package manager."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Clearly the typical approach of package-level versioning, particularly package manager enforced versioning is not the right way. Instead of using complex package version dependencies, we think it is better for the end user if the entire repository itself is \"versioned\", and through mechanisms appropriate for the repository maintainer and users. We propose that all subsystems within a repository should be coalesced into a repository-level snapshot that can be tested collectively for compatibility, and updated through a disciplined process that prevents broken dependencies.  For more serious projects employing AURA, it could make sense to fork dependent repositories, or maintain a project-specific curated repository that contains all the project's AURA dependencies of the correct versions. Upgrades can then be far more controlled, easily tested, verified, and predictable. This is more work, but it is also safer and much more reliable. Spending a bit more time to get things right, and to ease long-term maintainability, is the Ada way."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Decentralization means individual control, stability, and integrity."
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Besides preventing the disastrous issues with package-level versioning, a decentralized, simplified repository design brings other benefits. Forgoing a central authoritative repository comes with some cost to the end user, as they are responsible for finding and configuring the AURA repositories they use. To counteract the reduced convenience of this, we designed AURA repositories to be as simple as possible to create, maintain, configure, and use. AURA repositories are designed to be easily forked, consolidated, and reformed. Anyone can create a repository, and can host it in may ways. Forking repositories is easy, and advanced version control capabilities of source control (such as git) can be leveraged to great effect. As we will discuss later, git-based AURA repositories can very easily leverage submodules to coalesce subsystems from single independent sources (or even other AURA repositories)."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "The most basic AURA repository is simply a filesystem directory with subdirectories named after each AURA subsystem it contains. Such a "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "\"local\"",
+                            "link": "https://aura-docs.readthedocs.io/en/latest/concepts/repositories.html#local-repository-defn"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " repository can be on the physical filesystem, or an NFS share. No other special setup is needed to use such a repository besides putting subsystem units in their like-named subdirectories."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "We expect most repositories, however, to be based on "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "git",
+                            "link": "https://git-scm.com/"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ". AURA git repositories are extremely powerful, and the AURA CLI was designed specifically to integrate git. An AURA git repository can be structured exactly like a local repository, with each subsystem as a subdirectory, or they can be structured with submodules as subsystems. This makes setting-up a git repository, or transitioning between local and git repositories, super simple. An AURA git repository can also have any mix of either complete subsystem codebases, or subsystem submodules. This feature makes curated coalesced repositories easy to create and maintain. The idea is that individual subsystems can be placed in their own independent git repository, and then imported as submodules into a larger AURA repository. This is the approach we've taken with our "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "ASAP",
+                            "link": "https://github.com/annexi-strayline/ASAP"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " public repository, and serves as a great example. This design makes it super easy for community curators to create large coalesced repositories that draw from the broader community. Better yet, there is no central gate-keeper needed to \"approve\" any single AURA repository."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Users of AURA git repositories can configure them to follow a tracking branch, a specific commit, or tag. This is the primary mechanism for repository versioning, as discussed above."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "At the end of the day, we aimed to achieve two core goals with this approach. First, we wanted users to have the ability to easily protect existing stable code from unwanted breaking changes. Second, we wanted to ensure there would be no central authority - to ensure that AURA remains firmly in the public domain."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Supercharging Ada's forgotten superpower"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "One unusual and often overlooked feature of Ada that makes it such an excellent choice for any software project is its "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "built-in ability",
+                            "link": "http://ada-auth.org/standards/rm12_w_tc1/html/RM-B.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " to interface with other languages, particularly C/C++. Ada is one of a very small number of languages that clearly specifies direct interfacing between languages. This ability is crucial for the development of Ada bindings for common libraries - one use we expect to be particularly important for many open source AURA subsystems."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "A very common pattern when developing Ada bindings is to create an intermediate interface in a language like C, which exports some specialized set of functions to the Ada main program. This is usually necessary due to the prevalence of macros and/or the importance of preprocessing in C. So when developing a binding in Ada, it is common to have an implicit dependency on one or more separately compiled non-Ada \"external units\", that are nevertheless part of a broader Ada subsystem."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Beyond satisfying dependencies, AURA is also designed to handle configuration of non-Ada components of the subsystem, particularly by influencing the C preprocessor, as part of "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "auto configuration",
+                            "link": "https://aura-docs.readthedocs.io/en/latest/concepts/autoconfiguration.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " process. This makes it desirable to have a mechanism to easily integrate these kinds of typical non-Ada \"units\" that might be part of an AURA subsystem, where both sides can see a common set of configuration parameters set-up by the "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "auto configuration",
+                            "link": "https://aura-docs.readthedocs.io/en/latest/concepts/autoconfiguration.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " process. While nearly all of AURA's behaviour is triggered when a \"with\" statement indicates dependency on a subsystem that is not immediately available, this does not allow for \"external unit\" dependencies to be communicated to AURA. It therefore seemed appropriate to go the extra mile and allow AURA implementations to be aware of the direct dependency an Ada unit might have on a non-Ada \"external unit\"."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "To acheive this, AURA includes a new pragma - the "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "\"External_With\" pragma",
+                            "link": "https://aura-docs.readthedocs.io/en/latest/concepts/dependencies.html#concepts-dependencies-external-with"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ". Following the core philosophy of designing a hypothetical Ada Specialized Needs Annex, it is important that any such pragma (if not recognized) does not change the meaning of the program text, so that implementations which do not recognize the pragma simply revert to the standard behavior that has the user include the unit at link phase. For implementations that do support AURA, this process can then be fully automated (as it is in AURA CLI)."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "A modern workflow for modern Ada"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Beyond just behaving as a package manager, AURA is designed to support a modern build process, such that an AURA implementation (hopefully the compiler) can serve as an integrated end-to-end build system, particularly one that could be dropped into an automated CI/CD pipeline."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Traditionally the go-to Ada build tool has been "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "gprbuild",
+                            "link": "https://docs.adacore.com/gprbuild-docs/html/gprbuild_ug.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ", which is very unwelcoming to Ada newcomers (or anyone, really). The \"Ada-like\" configuration syntax is overly complex, and the documentation is difficult to navigate. More problematic than that, it is very difficult to gprbuild across multiple platforms. Suffice it to say, gprbuild is not user-friendly (or modern) as it needs to be. So beyond the basic package management roles, AURA was designed to be capable of replacing gprbuild under most scenarios - or more precisely, AURA intends to bring this higher-level build configuration closer to the compiler, rather than making yet another \"make\"."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Beyond the extended build-system functionality provided by a compliant AURA implementation, "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "AURA CLI",
+                            "link": "https://github.com/annexi-strayline/AURA"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " was architected from the beginning with a fully parallelized design. AURA CLI takes full advantage of all available cores, and is able to scale to massive projects built on large build servers. It was also designed to be maximally portable (which is admittedly easy with Ada). But when we say portable, we don't just mean the host operating environment - we also mean the compiler it drives. Though AURA CLI currently only targets GCC, it is designed to be as modular and pluggable as possible, so that it can easily be made to drive any other Ada compiler."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "The end of the beginning"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "AURA CLI is being released now into a public beta, but it is a mature beta that has seen a lot of action. As effective as it may be in core use-cases, it will be gaining more features in the future. The next core feature at the top our roadmap is to add a rich set of repository management capabilities."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Being the initial public release, we expect to community to discover some new issues, and we welcome issue reports and even pull requests to the "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "official repo",
+                            "link": "https://github.com/annexi-strayline/AURA"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Similarly, we put in a concerted efforts into writing the "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "official docs",
+                            "link": "https://aura-docs.readthedocs.io/"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ", but recognise that we might have missed things or left some questions unanswered. For things we missed or should elaborate on, we encourage anyone to also submit issue reports to the official docs "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "git repo",
+                            "link": "https://github.com/annexi-strayline/AURA-docs"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " so that we can continue to improve the documentation as well."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "One more thing."
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "Over the last number of years, we've developed a collection of useful permissively-licensed Ada subsystems primarily aimed at the development of modern cloud-native applications/APIs. This includes a full stack of TCP, TLS, HTTP, and JSON subsystems for the easy development of microservices applications and web APIs in Ada. We have been using these packages extensively internally, and they are mostly production ready."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "We designed most of these packages for use in very high-integrity, high-throughput, long-lifetime applications. Some components that process untrusted input (such as the UTF8 stream decoder) are written in "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "SPARK",
+                            "link": "https://www.adacore.com/about-spark"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ", and have been formally verified."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "We have made most of these packages AURA subsystems, and have been using them extensively with the AURA CLI to test it. For that reason, these packages have become part of the larger AURA project.  And so today, we are super excited to also be releasing our open source AURA subsystem collection to the community to complement the release of AURA CLI. We've named this repository the "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "ANNEXI-STRAYLINE AURA Public Repository (ASAP)",
+                            "link": "https://github.com/annexi-strayline/ASAP"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": ". An AURA repository configuration file to configure this repository is included in the "
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": "Quick Start",
+                            "link": "https://aura-docs.readthedocs.io/en/latest/quick_start/using_an_aura_package.html"
+                        },
+                        {
+                            "emphasis": "none",
+                            "segment": " section of the AURA CLI docs."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "break"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "bold",
+                            "segment": "Looking forward"
+                        }
+                    ]
+                },
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "We've got plenty more subsystems in the pipeline as well, and hope that these projects will be useful for anyone who can benefit from them. We'll add these to the ASAP repository as they become available."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "block": [
+                {
+                    "indent": 0,
+                    "line": [
+                        {
+                            "emphasis": "none",
+                            "segment": "We look forward to and very much appreciate issue reports and pull requests. Above all else, we hope the community finds AURA to be as useful as we have!"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

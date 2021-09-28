@@ -21,6 +21,10 @@ const elaborateBlock = (c, isList) => (
           segment_actual = <strong>{prespaced_segment}</strong>
           break
 
+        case "bold_strikethrough":
+          segment_actual = <strong><strike>{prespaced_segment}</strike></strong>
+          break
+
         case "italic":
           segment_actual = <i>{prespaced_segment}</i>
           break
@@ -70,6 +74,9 @@ const elaborateParagraph = (p) => {
 
     case "list":
       return (<ul className="list_block">{elaborateBlock(p.block, true)}</ul>)
+
+    case "numbered_list":
+      return (<ol type="1" className="ordered_list_block">{elaborateBlock(p.block, true)}</ol>)
 
     case "quote":
       return (<div className="quote_block">{elaborateBlock(p.block, false)}</div>)

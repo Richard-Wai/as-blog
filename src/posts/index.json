@@ -58,6 +58,18 @@
       ],
       "sequence": 3,
       "image": "https://annexi-strayline.com/blog_assets/3/polkit_ada_snippet.png"
+    },
+    {
+      "title": "AURA - The Ada User Repository Annex",
+      "subtitle": "Introducing a native package manager and build system for Ada.",
+      "author": "Richard Wai",
+      "abstract": "AURA is a hypothetical new specialized needs annex for the Ada stanndard. The idea was to imagine a truly native, integrated package managment system for Ada. We are excited to announce the open source release of our reference implementation - AURA CLI. This post disucsses the philosophy behind the desgin and developemnt of AURA.",
+      "topics": [
+        "Ada",
+        "Package Management"
+      ],
+      "sequence": 4,
+      "image": "https://annexi-strayline.com/blog_assets/3/polkit_ada_snippet.png"
     }
   ]
 }
