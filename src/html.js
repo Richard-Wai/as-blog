@@ -2,11 +2,17 @@ import React from "react"
 import PropTypes from "prop-types"
 
 const GoogleTagManager = {
-  head: `<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PGX8TJH');</script>`,
-  body: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PGX8TJH" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
+  head: `<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z7Z9YVD98V"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);} gtag('js', new Date());  gtag('config', 'G-Z7Z9YVD98V');</script>`,
+  body: ``
 }
 
-const IubendaCookiePolicy = `<style type="text/css"> #iubenda-cs-banner { bottom: 0px !important; left: 0px !important; position: fixed !important; width: 100% !important; z-index: 99999998 !important; background-color: #171618; } .iubenda-cs-content { display: block; margin: 0 auto; padding: 1em; width: auto; font-family: Helvetica,Arial,FreeSans,sans-serif; font-size: 14px; background: #171618; color: #fff;} .iubenda-cs-rationale { max-width: 900px; position: relative; margin: 0 auto; } .iubenda-banner-content > p { font-family: Helvetica,Arial,FreeSans,sans-serif; line-height: 1.5; } .iubenda-cs-close-btn { margin:0; color: #fff; text-decoration: none; font-size: 1em; position: absolute; top: 0; right: 0; border: none; } .iubenda-cs-cookie-policy-lnk { text-decoration: underline; color: #fff; font-size: 1em; font-weight: 900; } </style> <script type="text/javascript"> var _iub = _iub || []; _iub.csConfiguration = {"cookiePolicyInOtherWindow":true,"lang":"en","siteId":1429332,"localConsentDomain":"*.annexi-strayline.com","cookiePolicyId":36079784, "callback":{ onConsentGiven: function () {dataLayer.push({'event':'iubenda_consent_given'});} }, "banner":{ "prependOnBody":false,"applyStyles":false } }; </script><script type="text/javascript" src="//cdn.iubenda.com/cookie_solution/safemode/iubenda_cs.js" charset="UTF-8" async></script>`
+const IubendaCookiePolicy = `<script type="text/javascript">
+var _iub = _iub || [];
+_iub.csConfiguration = {"askConsentAtCookiePolicyUpdate":true,"cookiePolicyInOtherWindow":true,"countryDetection":true,"enableFadp":true,"enableLgpd":true,"enableUspr":true,"floatingPreferencesButtonCaptionColor":"#FFFFFF80","floatingPreferencesButtonColor":"#FFFFFF1C","floatingPreferencesButtonDisplay":"bottom-left","floatingPreferencesButtonIcon":false,"lang":"en","localConsentDomain":"*.annexi-strayline.com","preferenceCookie":{"expireAfter":180},"siteId":1429332,"storage":{"useSiteId":true},"usPreferencesWidgetDisplay":"inline-center","cookiePolicyId":36079784,"floatingPreferencesButtonCaption":true,"banner":{"acceptButtonDisplay":true,"closeButtonRejects":true,"customizeButtonDisplay":true,"position":"bottom","slideDown":false}};
+</script>
+<script type="text/javascript" src="https://cs.iubenda.com/autoblocking/1429332.js"></script>
+<script type="text/javascript" src="//cdn.iubenda.com/cs/gpp/stub.js"></script>
+<script type="text/javascript" src="//cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>`
 
 export default class HTML extends React.Component {
   render() {
@@ -19,6 +25,7 @@ export default class HTML extends React.Component {
             name="viewport"
             content="width=device-width, initial-scale=1, shrink-to-fit=no"
           />
+          <div dangerouslySetInnerHTML={{ __html: IubendaCookiePolicy }} />
           <div dangerouslySetInnerHTML={{ __html: GoogleTagManager.head }} />
           {this.props.headComponents}
         </head>
@@ -31,7 +38,6 @@ export default class HTML extends React.Component {
             dangerouslySetInnerHTML={{ __html: this.props.body }}
           />
           {this.props.postBodyComponents}
-          <div dangerouslySetInnerHTML={{ __html: IubendaCookiePolicy }} />
         </body>
       </html>
     )
